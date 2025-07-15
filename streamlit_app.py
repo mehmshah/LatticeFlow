@@ -65,11 +65,8 @@ def authenticate():
     st.sidebar.title("🌊 LatticeFlow")
     st.sidebar.markdown("---")
     
-    # Get password from secrets
-    correct_password = get_secret("APP_PASSWORD")
-    if not correct_password:
-        st.sidebar.error("⚠️ Password not configured. Please set APP_PASSWORD in secrets.")
-        st.stop()
+    # Get password from secrets or use dummy password
+    correct_password = get_secret("APP_PASSWORD") or "lattice123"
     
     password = st.sidebar.text_input("Password", type="password", key="auth_password")
     
@@ -83,6 +80,8 @@ def authenticate():
     
     if not st.session_state.authenticated:
         st.sidebar.warning("🔐 Please login to access the app")
+        if correct_password == "lattice123":
+            st.sidebar.info("💡 Using dummy password: lattice123")
         st.stop()
 
 # --- Enhanced navigation ---
