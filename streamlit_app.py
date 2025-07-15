@@ -6,14 +6,8 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 import sys
 
-# Add module paths
-sys.path.append('arcana-scrolls')
-sys.path.append('kinetica-forge')
-sys.path.append('aether-core')
-
-# Import existing modules
-from arcana_scrolls import am_prompt, pm_prompt
-from kinetica_forge import workout_flow
+# Module imports will be handled when backend is ready
+# For now, using placeholder functions to scaffold UI
 
 # --- Configuration ---
 st.set_page_config(
