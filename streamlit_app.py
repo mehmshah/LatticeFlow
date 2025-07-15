@@ -30,6 +30,12 @@ def init_session_state():
         st.session_state.user_preferences = load_user_preferences()
     if 'workout_page' not in st.session_state:
         st.session_state.workout_page = 'landing'
+    if 'journal_page' not in st.session_state:
+        st.session_state.journal_page = 'start'
+    if 'am_data' not in st.session_state:
+        st.session_state.am_data = {}
+    if 'pm_data' not in st.session_state:
+        st.session_state.pm_data = {}
 
 # --- Utility functions ---
 def load_user_preferences() -> Dict[str, Any]:
@@ -73,36 +79,51 @@ def authenticate():
 # --- Enhanced navigation ---
 def sidebar_navigation():
     """Enhanced sidebar navigation with icons and organization"""
-    st.sidebar.markdown("## 📱 Navigation")
+    # Collapsible sidebar toggle
+    if 'sidebar_collapsed' not in st.session_state:
+        st.session_state.sidebar_collapsed = False
     
-    # Group sections logically
-    sections = {
-        "📝 Journaling": ["AM Journal", "PM Journal"],
-        "💪 Physical": ["Workout Tracker", "Macro Cheat Sheet"],
-        "🧠 Mental Tools": ["Memory Board", "ADHD Toolkit"],
-        "⚙️ System": ["Diagnostics", "Settings"]
-    }
+    # Toggle button in main area
+    col1, col2 = st.columns([1, 10])
+    with col1:
+        if st.button("☰" if st.session_state.sidebar_collapsed else "✕", key="sidebar_toggle"):
+            st.session_state.sidebar_collapsed = not st.session_state.sidebar_collapsed
+            st.rerun()
     
-    selected_section = st.session_state.current_section
-    
-    for category, items in sections.items():
-        st.sidebar.markdown(f"**{category}**")
-        for item in items:
-            if st.sidebar.button(item, key=f"nav_{item}"):
-                st.session_state.current_section = item
-                st.rerun()
-    
-    # Add logout button
-    st.sidebar.markdown("---")
-    if st.sidebar.button("🚪 Logout"):
-        st.session_state.authenticated = False
-        st.rerun()
+    if not st.session_state.sidebar_collapsed:
+        st.sidebar.markdown("## 📱 Navigation")
+        
+        # Group sections logically
+        sections = {
+            "📝 Journaling": ["AM Journal", "PM Journal"],
+            "💪 Physical": ["Workout Tracker", "Macro Cheat Sheet"],
+            "🧠 Mental Tools": ["Memory Board", "ADHD Toolkit"],
+            "⚙️ System": ["Diagnostics", "Settings"]
+        }
+        
+        selected_section = st.session_state.current_section
+        
+        for category, items in sections.items():
+            st.sidebar.markdown(f"**{category}**")
+            for item in items:
+                if st.sidebar.button(item, key=f"nav_{item}"):
+                    st.session_state.current_section = item
+                    # Reset journal pages when switching sections
+                    if item in ["AM Journal", "PM Journal"]:
+                        st.session_state.journal_page = 'start'
+                    st.rerun()
+        
+        # Add logout button
+        st.sidebar.markdown("---")
+        if st.sidebar.button("🚪 Logout"):
+            st.session_state.authenticated = False
+            st.rerun()
     
     return st.session_state.current_section
 
 # --- Enhanced placeholder functions ---
 def am_journal():
-    """AM Journal with tabbed workflow"""
+    """AM Journal with Next button flow"""
     st.header("🌅 AM Journal")
     
     # Load instruction engine
@@ -113,10 +134,14 @@ def am_journal():
         st.error("Instruction engine not found. Please ensure aether-core/instruction_engine.json exists.")
         return
     
-    # Create tabs for workflow
-    tab1, tab2, tab3, tab4 = st.tabs(["🧘 Mantra", "😴 Sleep & Energy", "🎯 ADHD Focus", "❤️ Relational"])
+    if st.session_state.journal_page == 'start':
+        st.info("Begin your morning routine with a centering moment.")
+        
+        if st.button("Start Morning Routine", key="start_am"):
+            st.session_state.journal_page = 'mantra'
+            st.rerun()
     
-    with tab1:
+    elif st.session_state.journal_page == 'mantra':
         st.markdown("### 🧘 Mantra")
         st.markdown("#### *I choose commitment, integrity, control, and compassion for the best version of myself.*")
         
@@ -127,63 +152,125 @@ def am_journal():
                 # In a real implementation, this would pause for 60 seconds
         with col2:
             pause_complete = st.checkbox("Pause Complete")
+        
+        if st.button("Next: Sleep & Energy →", key="am_next1"):
+            st.session_state.am_data['pause_complete'] = pause_complete
+            st.session_state.journal_page = 'sleep_energy'
+            st.rerun()
     
-    with tab2:
+    elif st.session_state.journal_page == 'sleep_energy':
         st.markdown("### 😴 Sleep & Energy Assessment")
         st.caption("Sleep Scoring (1–10): 7 hours = 10/10. Halve the score for 3.5 hours. Round based on quality.")
         
         col1, col2 = st.columns(2)
         with col1:
-            sleep_hours = st.number_input("Hours of sleep:", min_value=0.0, max_value=12.0, value=7.0, step=0.5)
-            sleep_quality = st.slider("Sleep Quality (1–10)", 1, 10, 5, 
-                                     help="1 = very poor (<4h), 5 = light/interrupted, 10 = rested/uninterrupted")
+            sleep_hours = st.number_input("Hours of sleep:", min_value=0.0, max_value=12.0, 
+                                        value=st.session_state.am_data.get('sleep_hours', 7.0), step=0.5)
+            sleep_quality = st.slider("Sleep Quality (1–10)", 1, 10, 
+                                    st.session_state.am_data.get('sleep_quality', 5),
+                                    help="1 = very poor (<4h), 5 = light/interrupted, 10 = rested/uninterrupted")
         with col2:
-            energy_score = st.slider("Energy Level (1–10)", 1, 10, 5,
-                                    help="1 = depleted, 5 = functional but tired, 10 = energized and clear")
-    
-    with tab3:
-        st.markdown("### 🎯 ADHD Focus Planning")
-        adhd_plan = st.text_area("What is your ADHD focus for today?", height=100)
-        strategy = st.text_area("What strategy will support this?", height=100)
-        success = st.text_area("What would make today feel like a success?", height=100)
-    
-    with tab4:
-        st.markdown("### ❤️ Relational Intentions")
-        intentions = {}
+            energy_score = st.slider("Energy Level (1–10)", 1, 10, 
+                                   st.session_state.am_data.get('energy_score', 5),
+                                   help="1 = depleted, 5 = functional but tired, 10 = energized and clear")
+        
         col1, col2 = st.columns(2)
-        
         with col1:
-            intentions["Gabby"] = st.text_area("How do you want to show up for Gabby today?", height=80)
-            intentions["Cleo"] = st.text_area("What is your intention for Cleo today?", height=80)
+            if st.button("← Back", key="am_back1"):
+                st.session_state.journal_page = 'mantra'
+                st.rerun()
+        with col2:
+            if st.button("Next: ADHD Focus →", key="am_next2"):
+                st.session_state.am_data.update({
+                    'sleep_hours': sleep_hours,
+                    'sleep_quality': sleep_quality,
+                    'energy_score': energy_score
+                })
+                st.session_state.journal_page = 'adhd_focus'
+                st.rerun()
+    
+    elif st.session_state.journal_page == 'adhd_focus':
+        st.markdown("### 🎯 ADHD Focus Planning")
+        adhd_plan = st.text_area("What is your ADHD focus for today?", height=100,
+                                value=st.session_state.am_data.get('adhd_plan', ''))
+        strategy = st.text_area("What strategy will support this?", height=100,
+                               value=st.session_state.am_data.get('strategy', ''))
+        success = st.text_area("What would make today feel like a success?", height=100,
+                              value=st.session_state.am_data.get('success', ''))
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("← Back", key="am_back2"):
+                st.session_state.journal_page = 'sleep_energy'
+                st.rerun()
+        with col2:
+            if st.button("Next: Relational →", key="am_next3"):
+                st.session_state.am_data.update({
+                    'adhd_plan': adhd_plan,
+                    'strategy': strategy,
+                    'success': success
+                })
+                st.session_state.journal_page = 'relational'
+                st.rerun()
+    
+    elif st.session_state.journal_page == 'relational':
+        st.markdown("### ❤️ Relational Intentions")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            gabby_intention = st.text_area("How do you want to show up for Gabby today?", height=80,
+                                         value=st.session_state.am_data.get('intentions', {}).get('Gabby', ''))
+            cleo_intention = st.text_area("What is your intention for Cleo today?", height=80,
+                                        value=st.session_state.am_data.get('intentions', {}).get('Cleo', ''))
         
         with col2:
-            intentions["Parents/Brother"] = st.text_area("Any follow-up needed for your parents or brother today?", height=80)
-            intentions["Friends"] = st.text_area("How might you reach out to friends today?", height=80)
+            parents_intention = st.text_area("Any follow-up needed for your parents or brother today?", height=80,
+                                           value=st.session_state.am_data.get('intentions', {}).get('Parents/Brother', ''))
+            friends_intention = st.text_area("How might you reach out to friends today?", height=80,
+                                           value=st.session_state.am_data.get('intentions', {}).get('Friends', ''))
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("← Back", key="am_back3"):
+                st.session_state.journal_page = 'adhd_focus'
+                st.rerun()
+        with col2:
+            if st.button("Save & Complete →", key="am_save"):
+                intentions = {
+                    'Gabby': gabby_intention,
+                    'Cleo': cleo_intention,
+                    'Parents/Brother': parents_intention,
+                    'Friends': friends_intention
+                }
+                st.session_state.am_data['intentions'] = intentions
+                
+                # Save AM Log
+                am_entry = {
+                    "timestamp": datetime.now().isoformat(),
+                    **st.session_state.am_data
+                }
+                
+                # Save to file
+                os.makedirs("vesper-archive", exist_ok=True)
+                with open(f"vesper-archive/am_log_{datetime.now().strftime('%Y%m%d')}.json", "w") as f:
+                    json.dump(am_entry, f, indent=2)
+                
+                st.success("✅ Morning reflection saved!")
+                st.balloons()
+                st.session_state.journal_page = 'complete'
+                st.rerun()
     
-    # Save AM Log (outside tabs)
-    st.markdown("---")
-    if st.button("💾 Save Morning Reflection"):
-        am_entry = {
-            "timestamp": datetime.now().isoformat(),
-            "sleep_hours": sleep_hours,
-            "sleep_quality": sleep_quality,
-            "energy_score": energy_score,
-            "adhd_plan": adhd_plan,
-            "strategy": strategy,
-            "success": success,
-            "intentions": intentions
-        }
+    elif st.session_state.journal_page == 'complete':
+        st.success("🎉 Morning routine complete!")
+        st.info("Your morning reflection has been saved. Have a great day!")
         
-        # Save to file (following your system)
-        os.makedirs("vesper-archive", exist_ok=True)
-        with open(f"vesper-archive/am_log_{datetime.now().strftime('%Y%m%d')}.json", "w") as f:
-            json.dump(am_entry, f, indent=2)
-        
-        st.success("✅ Morning reflection saved!")
-        st.balloons()
+        if st.button("Start New Morning Routine", key="am_restart"):
+            st.session_state.journal_page = 'start'
+            st.session_state.am_data = {}
+            st.rerun()
 
 def pm_journal():
-    """PM Journal with tabbed workflow"""
+    """PM Journal with Next button flow"""
     st.header("🌙 PM Journal")
     
     # Load instruction engine and metric groups
@@ -196,10 +283,14 @@ def pm_journal():
         st.error("Required files not found. Please ensure aether-core/instruction_engine.json and numina-vault/metric_groups.json exist.")
         return
     
-    # Create tabs for workflow
-    tab1, tab2, tab3, tab4 = st.tabs(["🧘 Mantra", "💭 Reflection", "📊 Metrics", "🏷️ Tags & Summary"])
+    if st.session_state.journal_page == 'start':
+        st.info("Begin your evening reflection with a centering moment.")
+        
+        if st.button("Start Evening Routine", key="start_pm"):
+            st.session_state.journal_page = 'mantra'
+            st.rerun()
     
-    with tab1:
+    elif st.session_state.journal_page == 'mantra':
         st.markdown("### 🧘 Mantra")
         st.markdown("#### *I choose commitment, integrity, control, and compassion for the best version of myself.*")
         
@@ -209,64 +300,118 @@ def pm_journal():
                 st.info("Take a full minute to center yourself...")
         with col2:
             pause_complete = st.checkbox("Pause Complete")
+        
+        if st.button("Next: Reflection →", key="pm_next1"):
+            st.session_state.pm_data['pause_complete'] = pause_complete
+            st.session_state.journal_page = 'reflection'
+            st.rerun()
     
-    with tab2:
+    elif st.session_state.journal_page == 'reflection':
         st.markdown("### 💭 Free-Form Reflection")
         st.info("Start with completely free-form reflection. The system will analyze this for scoring and tagging.")
         
         reflection = st.text_area("Begin your reflection here:", height=200, 
+                                 value=st.session_state.pm_data.get('reflection', ''),
                                  placeholder="Share freely about your day, feelings, relationships, challenges, wins...")
         
-        reflection_complete = st.checkbox("Free reflection complete")
+        reflection_complete = st.checkbox("Free reflection complete", 
+                                        value=st.session_state.pm_data.get('reflection_complete', False))
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("← Back", key="pm_back1"):
+                st.session_state.journal_page = 'mantra'
+                st.rerun()
+        with col2:
+            if st.button("Next: Metrics →", key="pm_next2"):
+                st.session_state.pm_data.update({
+                    'reflection': reflection,
+                    'reflection_complete': reflection_complete
+                })
+                st.session_state.journal_page = 'metrics'
+                st.rerun()
     
-    with tab3:
-        if reflection_complete and reflection.strip():
+    elif st.session_state.journal_page == 'metrics':
+        if st.session_state.pm_data.get('reflection_complete') and st.session_state.pm_data.get('reflection', '').strip():
             st.markdown("### 📊 Metric Scoring")
             st.info("Based on your reflection, here are proposed metric scores:")
             
-            scores = {}
+            scores = st.session_state.pm_data.get('scores', {})
             for group_name, group_metrics in metric_groups["metric_groups"].items():
                 if group_name in ["Emotional Regulation", "ADHD + Self-Management", "Relationships", "Wellness + Physical State", "Learning + Meaning"]:
                     st.subheader(f"{group_name}")
                     for metric_name, metric_info in group_metrics.items():
                         if metric_info["scale"] == "1–10":
-                            scores[metric_name] = st.slider(f"{metric_name}", 1, 10, 5, 
+                            scores[metric_name] = st.slider(f"{metric_name}", 1, 10, 
+                                                           scores.get(metric_name, 5),
                                                            help=metric_info["definition"])
                         else:  # Y/N
                             scores[metric_name] = st.selectbox(f"{metric_name}", ["Y", "N"], 
+                                                              index=0 if scores.get(metric_name, "Y") == "Y" else 1,
                                                               help=metric_info["definition"])
             
             # Relationship follow-ups
             st.markdown("### 👥 Relationship Follow-ups")
             relationships = ["Gabby", "Cleo", "Parents", "Brother", "Friends"]
-            relationship_notes = {}
+            relationship_notes = st.session_state.pm_data.get('relationship_notes', {})
             
             for person in relationships:
-                if person.lower() not in reflection.lower():
-                    relationship_notes[person] = st.text_area(f"Add note about {person}:", height=80)
+                if person.lower() not in st.session_state.pm_data.get('reflection', '').lower():
+                    relationship_notes[person] = st.text_area(f"Add note about {person}:", height=80,
+                                                            value=relationship_notes.get(person, ''))
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("← Back", key="pm_back2"):
+                    st.session_state.journal_page = 'reflection'
+                    st.rerun()
+            with col2:
+                if st.button("Next: Summary →", key="pm_next3"):
+                    st.session_state.pm_data.update({
+                        'scores': scores,
+                        'relationship_notes': relationship_notes
+                    })
+                    st.session_state.journal_page = 'summary'
+                    st.rerun()
         else:
-            st.info("Complete your reflection in the previous tab to proceed with scoring.")
+            st.info("Complete your reflection in the previous step to proceed with scoring.")
+            if st.button("← Back to Reflection", key="pm_back2_alt"):
+                st.session_state.journal_page = 'reflection'
+                st.rerun()
     
-    with tab4:
-        if reflection_complete and reflection.strip():
-            st.markdown("### 🏷️ Tags & Emotions")
-            st.info("GPT will analyze your reflection for emotional tags and themes.")
-            
-            # Placeholder for GPT-generated tags
-            suggested_tags = ["#reflection", "#daily_review"]  # This would come from GPT
-            selected_tags = st.multiselect("Review and select tags:", suggested_tags, default=suggested_tags)
-            
-            # Macro summary
-            st.markdown("### 🍎 Macro Summary")
-            macro_summary = st.text_input("Quick macro summary for today:", placeholder="e.g., 2000 cal, 120g protein")
-            
-            # Save PM Log
-            if st.button("💾 Save Evening Reflection"):
+    elif st.session_state.journal_page == 'summary':
+        st.markdown("### 🏷️ Tags & Emotions")
+        st.info("GPT will analyze your reflection for emotional tags and themes.")
+        
+        # Placeholder for GPT-generated tags
+        suggested_tags = ["#reflection", "#daily_review"]  # This would come from GPT
+        selected_tags = st.multiselect("Review and select tags:", suggested_tags, 
+                                     default=st.session_state.pm_data.get('tags', suggested_tags))
+        
+        # Macro summary
+        st.markdown("### 🍎 Macro Summary")
+        macro_summary = st.text_input("Quick macro summary for today:", 
+                                     value=st.session_state.pm_data.get('macro_summary', ''),
+                                     placeholder="e.g., 2000 cal, 120g protein")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("← Back", key="pm_back3"):
+                st.session_state.journal_page = 'metrics'
+                st.rerun()
+        with col2:
+            if st.button("Save & Complete →", key="pm_save"):
+                st.session_state.pm_data.update({
+                    'tags': selected_tags,
+                    'macro_summary': macro_summary
+                })
+                
+                # Save PM Log
                 pm_entry = {
                     "timestamp": datetime.now().isoformat(),
-                    "reflection": reflection,
-                    "scores": scores,
-                    "relationship_notes": relationship_notes,
+                    "reflection": st.session_state.pm_data.get('reflection', ''),
+                    "scores": st.session_state.pm_data.get('scores', {}),
+                    "relationship_notes": st.session_state.pm_data.get('relationship_notes', {}),
                     "tags": selected_tags,
                     "macro_summary": macro_summary,
                     "gpt_analysis": "GPT analysis will be added here"
@@ -279,8 +424,17 @@ def pm_journal():
                 
                 st.success("✅ Evening reflection saved!")
                 st.balloons()
-        else:
-            st.info("Complete your reflection to proceed with tagging and summary.")
+                st.session_state.journal_page = 'complete'
+                st.rerun()
+    
+    elif st.session_state.journal_page == 'complete':
+        st.success("🎉 Evening routine complete!")
+        st.info("Your evening reflection has been saved. Sweet dreams!")
+        
+        if st.button("Start New Evening Routine", key="pm_restart"):
+            st.session_state.journal_page = 'start'
+            st.session_state.pm_data = {}
+            st.rerun()
 
 def workout_tracker():
     """Workout tracking with improved navigation and per-exercise RPE"""
