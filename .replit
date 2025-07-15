@@ -1,1 +1,9 @@
-run = "streamlit run streamlit_app.py"
+run = "streamlit run undefined"
+modules = ["python-3.12"]
+
+[deployment]
+run = ["sh", "-c", "streamlit run undefined"]
+
+[nix]
+channel = "stable-24_05"
+packages = ["glibcLocales", "leptonica", "pkg-config", "tesseract"]
