@@ -11,3 +11,7 @@ packages = ["glibcLocales", "leptonica", "pkg-config", "tesseract"]
 
 [env]
 PYTHONPATH = "$REPL_HOME"
+
+[[ports]]
+localPort = 8501
+externalPort = 80
