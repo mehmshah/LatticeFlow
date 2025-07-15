@@ -28,6 +28,8 @@ def init_session_state():
         st.session_state.conversation_history = {}
     if 'user_preferences' not in st.session_state:
         st.session_state.user_preferences = load_user_preferences()
+    if 'workout_page' not in st.session_state:
+        st.session_state.workout_page = 'landing'
 
 # --- Utility functions ---
 def load_user_preferences() -> Dict[str, Any]:
@@ -100,7 +102,7 @@ def sidebar_navigation():
 
 # --- Enhanced placeholder functions ---
 def am_journal():
-    """AM Journal following your established routine"""
+    """AM Journal with tabbed workflow"""
     st.header("🌅 AM Journal")
     
     # Load instruction engine
@@ -111,49 +113,55 @@ def am_journal():
         st.error("Instruction engine not found. Please ensure aether-core/instruction_engine.json exists.")
         return
     
-    st.info("Follow your established AM routine with sleep scoring, energy assessment, and intention setting.")
+    # Create tabs for workflow
+    tab1, tab2, tab3, tab4 = st.tabs(["🧘 Mantra", "😴 Sleep & Energy", "🎯 ADHD Focus", "❤️ Relational"])
     
-    # Mantra and pause
-    st.markdown("### 🧘 Mantra")
-    st.write("*I choose commitment, integrity, control, and compassion for the best version of myself.*")
+    with tab1:
+        st.markdown("### 🧘 Mantra")
+        st.markdown("#### *I choose commitment, integrity, control, and compassion for the best version of myself.*")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Start 1-Minute Pause", key="am_pause"):
+                st.info("Take a full minute to center yourself...")
+                # In a real implementation, this would pause for 60 seconds
+        with col2:
+            pause_complete = st.checkbox("Pause Complete")
     
-    if st.button("Start 1-Minute Pause"):
-        st.info("Take a full minute to center yourself...")
-        # In a real implementation, this would pause for 60 seconds
+    with tab2:
+        st.markdown("### 😴 Sleep & Energy Assessment")
+        st.caption("Sleep Scoring (1–10): 7 hours = 10/10. Halve the score for 3.5 hours. Round based on quality.")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            sleep_hours = st.number_input("Hours of sleep:", min_value=0.0, max_value=12.0, value=7.0, step=0.5)
+            sleep_quality = st.slider("Sleep Quality (1–10)", 1, 10, 5, 
+                                     help="1 = very poor (<4h), 5 = light/interrupted, 10 = rested/uninterrupted")
+        with col2:
+            energy_score = st.slider("Energy Level (1–10)", 1, 10, 5,
+                                    help="1 = depleted, 5 = functional but tired, 10 = energized and clear")
     
-    # Sleep and Energy Scoring (following your system)
-    st.markdown("### 😴 Sleep & Energy Assessment")
-    st.caption("Sleep Scoring (1–10): 7 hours = 10/10. Halve the score for 3.5 hours. Round based on quality.")
+    with tab3:
+        st.markdown("### 🎯 ADHD Focus Planning")
+        adhd_plan = st.text_area("What is your ADHD focus for today?", height=100)
+        strategy = st.text_area("What strategy will support this?", height=100)
+        success = st.text_area("What would make today feel like a success?", height=100)
     
-    col1, col2 = st.columns(2)
-    with col1:
-        sleep_hours = st.number_input("Hours of sleep:", min_value=0.0, max_value=12.0, value=7.0, step=0.5)
-        sleep_quality = st.slider("Sleep Quality (1–10)", 1, 10, 5, 
-                                 help="1 = very poor (<4h), 5 = light/interrupted, 10 = rested/uninterrupted")
-    with col2:
-        energy_score = st.slider("Energy Level (1–10)", 1, 10, 5,
-                                help="1 = depleted, 5 = functional but tired, 10 = energized and clear")
+    with tab4:
+        st.markdown("### ❤️ Relational Intentions")
+        intentions = {}
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            intentions["Gabby"] = st.text_area("How do you want to show up for Gabby today?", height=80)
+            intentions["Cleo"] = st.text_area("What is your intention for Cleo today?", height=80)
+        
+        with col2:
+            intentions["Parents/Brother"] = st.text_area("Any follow-up needed for your parents or brother today?", height=80)
+            intentions["Friends"] = st.text_area("How might you reach out to friends today?", height=80)
     
-    # ADHD Focus Planning
-    st.markdown("### 🎯 ADHD Focus Planning")
-    adhd_plan = st.text_area("What is your ADHD focus for today?", height=100)
-    strategy = st.text_area("What strategy will support this?", height=100)
-    success = st.text_area("What would make today feel like a success?", height=100)
-    
-    # Relational Intentions
-    st.markdown("### ❤️ Relational Intentions")
-    intentions = {}
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        intentions["Gabby"] = st.text_area("How do you want to show up for Gabby today?", height=80)
-        intentions["Cleo"] = st.text_area("What is your intention for Cleo today?", height=80)
-    
-    with col2:
-        intentions["Parents/Brother"] = st.text_area("Any follow-up needed for your parents or brother today?", height=80)
-        intentions["Friends"] = st.text_area("How might you reach out to friends today?", height=80)
-    
-    # Save AM Log
+    # Save AM Log (outside tabs)
+    st.markdown("---")
     if st.button("💾 Save Morning Reflection"):
         am_entry = {
             "timestamp": datetime.now().isoformat(),
@@ -175,7 +183,7 @@ def am_journal():
         st.balloons()
 
 def pm_journal():
-    """PM Journal following your established routine with GPT integration"""
+    """PM Journal with tabbed workflow"""
     st.header("🌙 PM Journal")
     
     # Load instruction engine and metric groups
@@ -188,84 +196,94 @@ def pm_journal():
         st.error("Required files not found. Please ensure aether-core/instruction_engine.json and numina-vault/metric_groups.json exist.")
         return
     
-    st.info("Follow your established PM routine with free-form reflection, GPT scoring, and emotion tagging.")
+    # Create tabs for workflow
+    tab1, tab2, tab3, tab4 = st.tabs(["🧘 Mantra", "💭 Reflection", "📊 Metrics", "🏷️ Tags & Summary"])
     
-    # Mantra and pause
-    st.markdown("### 🧘 Mantra")
-    st.write("*I choose commitment, integrity, control, and compassion for the best version of myself.*")
+    with tab1:
+        st.markdown("### 🧘 Mantra")
+        st.markdown("#### *I choose commitment, integrity, control, and compassion for the best version of myself.*")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Start 1-Minute Pause", key="pm_pause"):
+                st.info("Take a full minute to center yourself...")
+        with col2:
+            pause_complete = st.checkbox("Pause Complete")
     
-    if st.button("Start 1-Minute Pause"):
-        st.info("Take a full minute to center yourself...")
+    with tab2:
+        st.markdown("### 💭 Free-Form Reflection")
+        st.info("Start with completely free-form reflection. The system will analyze this for scoring and tagging.")
+        
+        reflection = st.text_area("Begin your reflection here:", height=200, 
+                                 placeholder="Share freely about your day, feelings, relationships, challenges, wins...")
+        
+        reflection_complete = st.checkbox("Free reflection complete")
     
-    # Free-form reflection (following your system)
-    st.markdown("### 💭 Free-Form Reflection")
-    st.info("Start with completely free-form reflection. The system will analyze this for scoring and tagging.")
-    
-    reflection = st.text_area("Begin your reflection here:", height=200, 
-                             placeholder="Share freely about your day, feelings, relationships, challenges, wins...")
-    
-    reflection_complete = st.checkbox("Free reflection complete")
-    
-    if reflection_complete and reflection.strip():
-        # Metric scoring (following your system)
-        st.markdown("### 📊 Metric Scoring")
-        st.info("Based on your reflection, here are proposed metric scores (GPT integration coming soon):")
-        
-        scores = {}
-        for group_name, group_metrics in metric_groups.items():
-            if group_name in ["Emotional Health", "Physical Health", "Learning + Meaning"]:
-                st.subheader(f"{group_name}")
-                for metric_name, metric_info in group_metrics.items():
-                    if metric_info["scale"] == "1–10":
-                        scores[metric_name] = st.slider(f"{metric_name}", 1, 10, 5, 
-                                                       help=metric_info["definition"])
-                    else:  # Y/N
-                        scores[metric_name] = st.selectbox(f"{metric_name}", ["Y", "N"], 
-                                                          help=metric_info["definition"])
-        
-        # Relationship follow-ups
-        st.markdown("### 👥 Relationship Follow-ups")
-        relationships = ["Gabby", "Cleo", "Parents", "Brother", "Friends"]
-        relationship_notes = {}
-        
-        for person in relationships:
-            if person.lower() not in reflection.lower():
-                relationship_notes[person] = st.text_area(f"Add note about {person}:", height=80)
-        
-        # Tagging and emotion analysis
-        st.markdown("### 🏷️ Tags & Emotions")
-        st.info("GPT will analyze your reflection for emotional tags and themes.")
-        
-        # Placeholder for GPT-generated tags
-        suggested_tags = ["#reflection", "#daily_review"]  # This would come from GPT
-        selected_tags = st.multiselect("Review and select tags:", suggested_tags, default=suggested_tags)
-        
-        # Macro summary
-        st.markdown("### 🍎 Macro Summary")
-        macro_summary = st.text_input("Quick macro summary for today:", placeholder="e.g., 2000 cal, 120g protein")
-        
-        # Save PM Log
-        if st.button("💾 Save Evening Reflection"):
-            pm_entry = {
-                "timestamp": datetime.now().isoformat(),
-                "reflection": reflection,
-                "scores": scores,
-                "relationship_notes": relationship_notes,
-                "tags": selected_tags,
-                "macro_summary": macro_summary,
-                "gpt_analysis": "GPT analysis will be added here"
-            }
+    with tab3:
+        if reflection_complete and reflection.strip():
+            st.markdown("### 📊 Metric Scoring")
+            st.info("Based on your reflection, here are proposed metric scores:")
             
-            # Save to file (following your system)
-            os.makedirs("vesper-archive", exist_ok=True)
-            with open(f"vesper-archive/pm_log_{datetime.now().strftime('%Y%m%d')}.json", "w") as f:
-                json.dump(pm_entry, f, indent=2)
+            scores = {}
+            for group_name, group_metrics in metric_groups["metric_groups"].items():
+                if group_name in ["Emotional Regulation", "ADHD + Self-Management", "Relationships", "Wellness + Physical State", "Learning + Meaning"]:
+                    st.subheader(f"{group_name}")
+                    for metric_name, metric_info in group_metrics.items():
+                        if metric_info["scale"] == "1–10":
+                            scores[metric_name] = st.slider(f"{metric_name}", 1, 10, 5, 
+                                                           help=metric_info["definition"])
+                        else:  # Y/N
+                            scores[metric_name] = st.selectbox(f"{metric_name}", ["Y", "N"], 
+                                                              help=metric_info["definition"])
             
-            st.success("✅ Evening reflection saved!")
-            st.balloons()
+            # Relationship follow-ups
+            st.markdown("### 👥 Relationship Follow-ups")
+            relationships = ["Gabby", "Cleo", "Parents", "Brother", "Friends"]
+            relationship_notes = {}
+            
+            for person in relationships:
+                if person.lower() not in reflection.lower():
+                    relationship_notes[person] = st.text_area(f"Add note about {person}:", height=80)
+        else:
+            st.info("Complete your reflection in the previous tab to proceed with scoring.")
+    
+    with tab4:
+        if reflection_complete and reflection.strip():
+            st.markdown("### 🏷️ Tags & Emotions")
+            st.info("GPT will analyze your reflection for emotional tags and themes.")
+            
+            # Placeholder for GPT-generated tags
+            suggested_tags = ["#reflection", "#daily_review"]  # This would come from GPT
+            selected_tags = st.multiselect("Review and select tags:", suggested_tags, default=suggested_tags)
+            
+            # Macro summary
+            st.markdown("### 🍎 Macro Summary")
+            macro_summary = st.text_input("Quick macro summary for today:", placeholder="e.g., 2000 cal, 120g protein")
+            
+            # Save PM Log
+            if st.button("💾 Save Evening Reflection"):
+                pm_entry = {
+                    "timestamp": datetime.now().isoformat(),
+                    "reflection": reflection,
+                    "scores": scores,
+                    "relationship_notes": relationship_notes,
+                    "tags": selected_tags,
+                    "macro_summary": macro_summary,
+                    "gpt_analysis": "GPT analysis will be added here"
+                }
+                
+                # Save to file
+                os.makedirs("vesper-archive", exist_ok=True)
+                with open(f"vesper-archive/pm_log_{datetime.now().strftime('%Y%m%d')}.json", "w") as f:
+                    json.dump(pm_entry, f, indent=2)
+                
+                st.success("✅ Evening reflection saved!")
+                st.balloons()
+        else:
+            st.info("Complete your reflection to proceed with tagging and summary.")
 
 def workout_tracker():
-    """Workout tracking using your established system"""
+    """Workout tracking with improved navigation and per-exercise RPE"""
     st.header("💪 Workout Tracker")
     
     # Load workout plan
@@ -276,8 +294,18 @@ def workout_tracker():
         st.error("Workout plan not found. Please ensure kinetica-forge/workout_plan.json exists.")
         return
     
-    if 'workout_page' not in st.session_state:
-        st.session_state.workout_page = 'landing'
+    # RPE Framework in sidebar
+    with st.sidebar:
+        st.markdown("### 📊 RPE Framework")
+        st.markdown("""
+        **1-2**: Very light activity
+        **3-4**: Light activity
+        **5-6**: Moderate activity
+        **7**: Vigorous activity
+        **8**: Very vigorous activity
+        **9**: Extremely vigorous
+        **10**: Maximum effort
+        """)
     
     if st.session_state.workout_page == 'landing':
         st.info("Select a workout template from your established plan:")
@@ -314,19 +342,24 @@ def workout_tracker():
         
         st.subheader(f"Logging: {details['title']}")
         
-        # Pre-workout scoring (your system)
+        # Back button
+        if st.button("← Back to Workout Selection"):
+            st.session_state.workout_page = 'landing'
+            st.rerun()
+        
+        # Pre-workout scoring with info buttons
         st.markdown("### 🔄 Pre-Workout Assessment")
-        st.caption("Energy: 1 = depleted, 5 = functional but tired, 10 = fully energized")
-        st.caption("Mood: 1 = anxious/irritable, 5 = neutral, 10 = positive/uplifted")
-        st.caption("Recovery: 1 = sore/exhausted, 5 = okay, 10 = fully recovered")
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            pre_energy = st.slider("Energy (1-10)", 1, 10, 5)
+            st.info("**Energy Framework**\n1 = depleted\n5 = functional but tired\n10 = fully energized")
+            pre_energy = st.slider("Energy (1-10)", 1, 10, 5, key="pre_energy")
         with col2:
-            pre_mood = st.slider("Mood (1-10)", 1, 10, 5)
+            st.info("**Mood Framework**\n1 = anxious/irritable\n5 = neutral\n10 = positive/uplifted")
+            pre_mood = st.slider("Mood (1-10)", 1, 10, 5, key="pre_mood")
         with col3:
-            pre_recovery = st.slider("Recovery (1-10)", 1, 10, 5)
+            st.info("**Recovery Framework**\n1 = sore/exhausted\n5 = okay\n10 = fully recovered")
+            pre_recovery = st.slider("Recovery (1-10)", 1, 10, 5, key="pre_recovery")
         
         # Warm-up tracking
         st.markdown("### 🤸 Warm-up")
@@ -337,67 +370,85 @@ def workout_tracker():
                 key=f"warmup_{move['name']}"
             )
         
-        # Superset logging
+        # Superset logging with per-exercise RPE
         st.markdown("### 🏋️ Supersets")
         superset_logs = []
         
-        for idx, superset in enumerate(details.get("supersets", [])):
+        for superset_idx, superset in enumerate(details.get("supersets", [])):
             st.subheader(f"{superset['title']} - {superset.get('sets', 4)} sets")
             
-            for ex in superset["exercises"]:
-                col1, col2, col3 = st.columns([2, 1, 1])
-                with col1:
-                    st.write(f"**{ex['name']}** - {ex['reps']}")
-                    st.caption(ex.get("desc", ""))
-                with col2:
-                    actual_reps = st.text_input("Actual reps", value=ex["reps"], 
-                                               key=f"reps_{workout_day}_{idx}_{ex['name']}")
-                with col3:
-                    completed = st.checkbox("Done", key=f"done_{workout_day}_{idx}_{ex['name']}")
+            for ex_idx, ex in enumerate(superset["exercises"]):
+                st.markdown(f"**{ex['name']}** - {ex['reps']}")
+                if ex.get("desc"):
+                    st.caption(ex["desc"])
+                
+                # Create columns for each set
+                set_cols = st.columns(superset.get('sets', 4))
+                exercise_sets = []
+                
+                for set_num in range(superset.get('sets', 4)):
+                    with set_cols[set_num]:
+                        st.write(f"Set {set_num + 1}")
+                        actual_reps = st.text_input(
+                            "Reps", 
+                            value=ex["reps"], 
+                            key=f"reps_{superset_idx}_{ex_idx}_{set_num}"
+                        )
+                        rpe = st.slider(
+                            "RPE", 
+                            1, 10, 7, 
+                            key=f"rpe_{superset_idx}_{ex_idx}_{set_num}"
+                        )
+                        completed = st.checkbox(
+                            "✓", 
+                            key=f"done_{superset_idx}_{ex_idx}_{set_num}"
+                        )
+                        
+                        exercise_sets.append({
+                            "set": set_num + 1,
+                            "reps": actual_reps,
+                            "rpe": rpe,
+                            "completed": completed
+                        })
                 
                 superset_logs.append({
                     "exercise": ex["name"],
                     "planned_reps": ex["reps"],
-                    "actual_reps": actual_reps,
-                    "completed": completed
+                    "sets": exercise_sets
                 })
-        
-        # RPE scoring
-        st.markdown("### 📈 RPE (Rate of Perceived Exertion)")
-        rpe = st.slider("Overall RPE (1-10)", 1, 10, 7)
-        
-        # RPE reference in sidebar
-        with st.sidebar:
-            st.markdown("### 📊 RPE Reference")
-            st.write("6 = Easy conversation pace")
-            st.write("7 = Somewhat hard")
-            st.write("8 = Hard, challenging")
-            st.write("9 = Very hard")
-            st.write("10 = Maximum effort")
+                
+                st.markdown("---")
         
         # Cool-down
         st.markdown("### 🧘 Cool-down")
         cooldown_notes = st.text_area("Cool-down notes:", height=80)
         
-        # Post-workout scoring
+        # Post-workout scoring with info buttons
         st.markdown("### 🔄 Post-Workout Assessment")
         col1, col2, col3 = st.columns(3)
         with col1:
-            post_energy = st.slider("Post-Energy (1-10)", 1, 10, 5)
+            st.info("**Energy Framework**\n1 = depleted\n5 = functional but tired\n10 = fully energized")
+            post_energy = st.slider("Post-Energy (1-10)", 1, 10, 5, key="post_energy")
         with col2:
-            post_mood = st.slider("Post-Mood (1-10)", 1, 10, 5)
+            st.info("**Mood Framework**\n1 = anxious/irritable\n5 = neutral\n10 = positive/uplifted")
+            post_mood = st.slider("Post-Mood (1-10)", 1, 10, 5, key="post_mood")
         with col3:
-            post_recovery = st.slider("Post-Recovery (1-10)", 1, 10, 5)
+            st.info("**Recovery Framework**\n1 = sore/exhausted\n5 = okay\n10 = fully recovered")
+            post_recovery = st.slider("Post-Recovery (1-10)", 1, 10, 5, key="post_recovery")
         
         # Notes and auto-tagging
         st.markdown("### 📝 Notes & Tags")
         workout_notes = st.text_area("Workout notes:", height=100)
         
-        # Auto-generated tags (following your system)
+        # Auto-generated tags
+        completed_sets = sum(1 for log in superset_logs for s in log["sets"] if s["completed"])
+        total_sets = sum(len(log["sets"]) for log in superset_logs)
+        
         auto_tags = []
-        if sum(superset_logs[i]["completed"] for i in range(len(superset_logs))) > len(superset_logs) * 0.8:
+        if completed_sets > total_sets * 0.8:
             auto_tags.append("#goal_hit")
-        if rpe >= 8:
+        avg_rpe = sum(s["rpe"] for log in superset_logs for s in log["sets"]) / max(total_sets, 1)
+        if avg_rpe >= 8:
             auto_tags.append("#high_intensity")
         auto_tags.append("#consistency")
         
@@ -412,14 +463,13 @@ def workout_tracker():
                 "pre_scores": {"energy": pre_energy, "mood": pre_mood, "recovery": pre_recovery},
                 "warmup_completed": warmup_completed,
                 "supersets": superset_logs,
-                "rpe": rpe,
                 "cooldown_notes": cooldown_notes,
                 "post_scores": {"energy": post_energy, "mood": post_mood, "recovery": post_recovery},
                 "notes": workout_notes,
                 "tags": selected_tags
             }
             
-            # Save to workout history (following your system)
+            # Save to workout history
             os.makedirs("kinetica-forge", exist_ok=True)
             try:
                 with open("kinetica-forge/workout_history.json", "r") as f:
@@ -456,10 +506,6 @@ def workout_tracker():
                     file_name=f"workout_log_{today}.md",
                     mime="text/markdown"
                 )
-        
-        if st.button("← Back to Workout Selection"):
-            st.session_state.workout_page = 'landing'
-            st.rerun()
     
     elif st.session_state.workout_page == 'custom':
         st.subheader("Custom Workout (Coming Soon)")
@@ -470,7 +516,7 @@ def workout_tracker():
             st.rerun()
 
 def generate_workout_markdown(entry):
-    """Generate markdown export for workout (following your template)"""
+    """Generate markdown export for workout"""
     md = f"## 🏋️ Workout Log — {entry['timestamp'][:10]}\n\n"
     md += f"### {entry['title']}\n\n"
     md += f"### 🔄 Pre-Workout\n"
@@ -480,10 +526,11 @@ def generate_workout_markdown(entry):
     
     md += f"### 🏋️ Supersets\n"
     for s in entry['supersets']:
-        status = "✅" if s['completed'] else "❌"
-        md += f"- {status} {s['exercise']}: {s['actual_reps']} reps\n"
-    
-    md += f"\n### 📈 RPE: {entry['rpe']}/10\n\n"
+        md += f"**{s['exercise']}**\n"
+        for set_data in s['sets']:
+            status = "✅" if set_data['completed'] else "❌"
+            md += f"- {status} Set {set_data['set']}: {set_data['reps']} reps @ RPE {set_data['rpe']}\n"
+        md += "\n"
     
     md += f"### 🔄 Post-Workout\n"
     md += f"- Energy: {entry['post_scores']['energy']}/10\n"
@@ -496,10 +543,10 @@ def generate_workout_markdown(entry):
     return md
 
 def macro_cheat_sheet():
-    """Macro tracking with OCR support"""
+    """Macro tracking with mobile-optimized OCR support"""
     st.header("🍎 Macro Cheat Sheet")
     
-    tab1, tab2, tab3 = st.tabs(["📊 Quick Reference", "📱 Label Scanner", "🛒 Grocery List"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Quick Reference", "📱 Label Scanner", "🛒 Grocery List", "📖 Meal Planning"])
     
     with tab1:
         st.info("Quick macro reference for common foods.")
@@ -517,14 +564,97 @@ def macro_cheat_sheet():
                 st.write(f"• **{food}**: {macro}")
     
     with tab2:
-        st.info("📱 OCR label scanning coming soon...")
-        uploaded_file = st.file_uploader("Upload food label image", type=['png', 'jpg', 'jpeg'])
-        if uploaded_file:
-            st.image(uploaded_file, caption="Uploaded label")
-            st.info("OCR processing will be implemented here")
+        st.info("📱 Scan food labels for macro information")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            uploaded_file = st.file_uploader("Upload food label image", type=['png', 'jpg', 'jpeg'])
+            if uploaded_file:
+                st.image(uploaded_file, caption="Uploaded label")
+                st.info("OCR processing will be implemented here")
+        
+        with col2:
+            st.markdown("### 📸 Mobile Camera")
+            if st.button("📸 Take Photo", help="Use camera to scan label"):
+                st.info("Camera integration will be implemented here")
     
     with tab3:
-        st.info("🛒 Grocery tracking and meal planning...")
+        st.info("🛒 Track grocery items and shopping lists")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            uploaded_grocery = st.file_uploader("Upload grocery receipt", type=['png', 'jpg', 'jpeg'])
+            if uploaded_grocery:
+                st.image(uploaded_grocery, caption="Grocery receipt")
+                st.info("Receipt OCR processing will be implemented here")
+        
+        with col2:
+            st.markdown("### 📸 Snap Receipt")
+            if st.button("📸 Photo Receipt", help="Use camera to scan receipt"):
+                st.info("Receipt camera integration will be implemented here")
+        
+        # Manual grocery list
+        st.markdown("### Manual Grocery List")
+        grocery_item = st.text_input("Add grocery item:")
+        if st.button("Add Item") and grocery_item:
+            if 'grocery_list' not in st.session_state:
+                st.session_state.grocery_list = []
+            st.session_state.grocery_list.append(grocery_item)
+            st.success(f"Added: {grocery_item}")
+        
+        # Display grocery list
+        if 'grocery_list' in st.session_state and st.session_state.grocery_list:
+            st.markdown("### Current List")
+            for i, item in enumerate(st.session_state.grocery_list):
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.write(f"• {item}")
+                with col2:
+                    if st.button("Remove", key=f"remove_grocery_{i}"):
+                        st.session_state.grocery_list.pop(i)
+                        st.rerun()
+    
+    with tab4:
+        st.info("📖 Upload and catalog recipes and meal ideas")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            recipe_upload = st.file_uploader("Upload recipe image", type=['png', 'jpg', 'jpeg'])
+            if recipe_upload:
+                st.image(recipe_upload, caption="Recipe")
+                st.info("Recipe OCR processing will be implemented here")
+        
+        with col2:
+            st.markdown("### 📸 Photo Recipe")
+            if st.button("📸 Take Recipe Photo", help="Use camera to capture recipe"):
+                st.info("Recipe camera integration will be implemented here")
+        
+        # Manual recipe entry
+        st.markdown("### Manual Recipe Entry")
+        recipe_name = st.text_input("Recipe name:")
+        recipe_content = st.text_area("Recipe content:", height=200)
+        
+        if st.button("Save Recipe") and recipe_name and recipe_content:
+            if 'recipes' not in st.session_state:
+                st.session_state.recipes = []
+            
+            new_recipe = {
+                'name': recipe_name,
+                'content': recipe_content,
+                'created': datetime.now().strftime("%Y-%m-%d %H:%M")
+            }
+            st.session_state.recipes.append(new_recipe)
+            st.success(f"Recipe '{recipe_name}' saved!")
+        
+        # Display recipes
+        if 'recipes' in st.session_state and st.session_state.recipes:
+            st.markdown("### Saved Recipes")
+            for i, recipe in enumerate(st.session_state.recipes):
+                with st.expander(f"{recipe['name']} - {recipe['created']}"):
+                    st.write(recipe['content'])
+                    if st.button("Delete Recipe", key=f"delete_recipe_{i}"):
+                        st.session_state.recipes.pop(i)
+                        st.rerun()
 
 def memory_board():
     """Card-based memory board"""
@@ -690,12 +820,7 @@ def main():
     # Main content area
     section = sidebar_navigation()
     
-    # Header
-    st.title("🌊 LatticeFlow")
-    st.markdown("*Modular Journaling & Workout System*")
-    st.markdown("---")
-    
-    # Route to appropriate section
+    # Route to appropriate section (no LatticeFlow header per request)
     if section == "AM Journal":
         am_journal()
     elif section == "PM Journal":
