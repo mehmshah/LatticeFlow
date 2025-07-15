@@ -1,9 +1,13 @@
-run = "streamlit run undefined"
+
+run = "streamlit run streamlit_app.py --server.address 0.0.0.0 --server.headless true --server.enableCORS=false --server.enableWebsocketCompression=false"
 modules = ["python-3.12"]
 
 [deployment]
-run = ["sh", "-c", "streamlit run undefined"]
+run = ["sh", "-c", "streamlit run streamlit_app.py --server.address 0.0.0.0 --server.headless true --server.enableCORS=false --server.enableWebsocketCompression=false"]
 
 [nix]
 channel = "stable-24_05"
 packages = ["glibcLocales", "leptonica", "pkg-config", "tesseract"]
+
+[env]
+PYTHONPATH = "$REPL_HOME"
