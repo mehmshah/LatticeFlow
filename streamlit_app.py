@@ -66,33 +66,13 @@ def get_secret(key: str) -> Optional[str]:
     except Exception:
         return None
 
-# --- Improved authentication ---
+# --- Simplified authentication (no password for testing) ---
 def authenticate():
-    """Secure authentication with session state"""
-    if st.session_state.authenticated:
-        return True
-    
+    """Skip authentication for testing"""
+    st.session_state.authenticated = True
     st.sidebar.title("🌊 LatticeFlow")
     st.sidebar.markdown("---")
-    
-    # Get password from secrets or use dummy password
-    correct_password = get_secret("APP_PASSWORD") or "lattice123"
-    
-    password = st.sidebar.text_input("Password", type="password", key="auth_password")
-    
-    if st.sidebar.button("Login"):
-        if password == correct_password:
-            st.session_state.authenticated = True
-            st.sidebar.success("✅ Authenticated!")
-            st.rerun()
-        else:
-            st.sidebar.error("❌ Invalid password")
-    
-    if not st.session_state.authenticated:
-        st.sidebar.warning("🔐 Please login to access the app")
-        if correct_password == "lattice123":
-            st.sidebar.info("💡 Using dummy password: lattice123")
-        st.stop()
+    st.sidebar.info("🔓 Authentication disabled for testing")
 
 # --- Enhanced navigation ---
 def sidebar_navigation():
