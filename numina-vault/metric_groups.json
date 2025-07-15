@@ -1,0 +1,163 @@
+"metric_groups": {
+  "Emotional Regulation": {
+    "Emotional Regulation": {
+      "definition": "Ability to stay grounded when emotionally activated.",
+      "scale": "1–10",
+      "anchors": {
+        "1": "Fully reactive, spiraled or shutdown",
+        "3": "Aware but struggled to reset",
+        "5": "Managed minor spikes with effort",
+        "7": "Used a ritual or paused to self-regulate",
+        "10": "Stayed emotionally steady throughout the day"
+      }
+    },
+    "Flood Recovery": {
+      "definition": "How effectively you reset after flooding (if it occurred).",
+      "scale": "1–10 or null",
+      "anchors": {
+        "null": "No flooding occurred",
+        "3": "Remained flooded most of the day",
+        "5": "Used partial reset with some success",
+        "7": "Used reset ritual and rebalanced quickly",
+        "10": "Recovered quickly and fully reset"
+      }
+    },
+    "Shame Complex": {
+      "definition": "Level of internalized shame that colored your self-perception.",
+      "scale": "1–10",
+      "anchors": {
+        "1": "Spiraled into self-hatred or unworthiness",
+        "3": "Subtle shame shifted behavior or tone",
+        "5": "Aware but didn’t spiral",
+        "7": "Noted and avoided the shame pattern",
+        "10": "No shame activation today"
+      }
+    },
+    "Self-Assurance": {
+      "definition": "Confidence in your values and internal compass.",
+      "scale": "1–10",
+      "anchors": {
+        "1": "Externally reactive, no self-grounding",
+        "5": "Mixed confidence, contextually wobbly",
+        "10": "Clear self-trust and emotional agency"
+      }
+    }
+  },
+  "ADHD + Self-Management": {
+    "Task Balancing": {
+      "definition": "Ability to switch between tasks fluidly and prioritize effectively.",
+      "scale": "1–10",
+      "anchors": {
+        "1": "Stuck or paralyzed in one mode",
+        "3": "Bounced chaotically, nothing finished",
+        "5": "Made progress but reactive",
+        "7": "Mostly intentional switching",
+        "10": "Fully fluid, effective transitions"
+      }
+    },
+    "Forgetfulness": {
+      "definition": "Memory and follow-through for commitments and cues.",
+      "scale": "1–10",
+      "anchors": {
+        "1": "Forgot major items",
+        "5": "Some slips, used cues to recover",
+        "10": "Tracked everything with high recall"
+      }
+    },
+    "Change Management": {
+      "definition": "Your flexibility when plans shifted.",
+      "scale": "1–10",
+      "anchors": {
+        "1": "Resisted change or spiraled",
+        "5": "Recovered slowly after friction",
+        "10": "Adapted smoothly, no emotional drag"
+      }
+    },
+    "Mindfulness": {
+      "definition": "Level of present-moment awareness and non-reactivity.",
+      "scale": "1–10",
+      "anchors": {
+        "1": "No awareness moments",
+        "5": "Brief resets, still distracted",
+        "10": "Sustained intentional presence"
+      }
+    }
+  },
+  "Relationships": {
+    "Intimacy": {
+      "definition": "Emotional or physical closeness, especially with Gabby.",
+      "scale": "1–10",
+      "anchors": {
+        "1": "Emotionally shut down",
+        "5": "Functional but emotionally distant",
+        "10": "Vulnerable, co-regulated, fully present"
+      }
+    },
+    "Affection": {
+      "definition": "Verbal or nonverbal expressions of love or warmth.",
+      "scale": "1–10",
+      "anchors": {
+        "1": "Withdrawn or cold",
+        "5": "Minimal or habitual affection",
+        "10": "Frequent, mutual, or deeply felt affection"
+      }
+    },
+    "Appreciation": {
+      "definition": "Acknowledgment and gratitude given or received.",
+      "scale": "1–10",
+      "anchors": {
+        "1": "No appreciation surfaced",
+        "5": "Generic or low-effort gratitude",
+        "10": "Specific, emotional appreciation offered and/or received"
+      }
+    },
+    "Meaningful Connection": {
+      "definition": "Presence of any emotionally rich moment today.",
+      "scale": "Y/N"
+    }
+  },
+  "Wellness + Physical State": {
+    "Sleep": {
+      "definition": "Quality and depth of sleep last night.",
+      "scale": "1–10"
+    },
+    "Sleep Hygiene": {
+      "definition": "Did you follow your bedtime ritual (tea, melatonin, no screens or emotional convos after 10 PM)?",
+      "scale": "1–10"
+    },
+    "Digestion": {
+      "definition": "Comfort, regularity, and gut symptoms today.",
+      "scale": "1–10"
+    },
+    "Water": {
+      "definition": "Hydration effort (~3L target).",
+      "scale": "1–10"
+    },
+    "Physical Activity": {
+      "definition": "Intensity and intention behind today’s movement.",
+      "scale": "1–10"
+    },
+    "Meditation": {
+      "definition": "Did you practice a mindful pause today?",
+      "scale": "Y/N"
+    },
+    "Supplements": {
+      "definition": "Did you take your AM/PM supplements (for you and Gabby)?",
+      "scale": "Y/N"
+    }
+  },
+  "Learning + Meaning": {
+    "Content Consumed": {
+      "definition": "Did you engage with emotionally or intellectually enriching content?",
+      "scale": "Y/N"
+    },
+    "Emotional Learnings": {
+      "definition": "Did you reflect on your emotional growth or internal narrative today?",
+      "scale": "Y/N"
+    },
+    "Relationship Learnings": {
+      "definition": "Did you notice any insight in your relationships?",
+      "scale": "Y/N"
+    }
+  }
+}
