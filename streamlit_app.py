@@ -36,6 +36,8 @@ def init_session_state():
         st.session_state.am_data = {}
     if 'pm_data' not in st.session_state:
         st.session_state.pm_data = {}
+    if 'show_landing' not in st.session_state:
+        st.session_state.show_landing = True
 
 # --- Utility functions ---
 def load_user_preferences() -> Dict[str, Any]:
@@ -79,28 +81,43 @@ def authenticate():
 
 # --- Enhanced navigation ---
 def sidebar_navigation():
-    """Right-side hamburger menu navigation"""
+    """Right-side hamburger menu navigation with overlay"""
     # Initialize sidebar state
     if 'sidebar_open' not in st.session_state:
         st.session_state.sidebar_open = False
     
     # Create top bar with hamburger menu
-    col1, col2, col3 = st.columns([8, 1, 1])
+    col1, col2 = st.columns([9, 1])
     
     with col2:
-        st.markdown(f"**{st.session_state.current_section}**")
-    
-    with col3:
         if st.button("☰", key="hamburger_menu", help="Navigation Menu"):
             st.session_state.sidebar_open = not st.session_state.sidebar_open
             st.rerun()
     
-    # Show navigation menu when open
+    # Show navigation menu when open with overlay styling
     if st.session_state.sidebar_open:
+        # Create overlay effect with CSS
+        st.markdown("""
+        <style>
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            border-left: 2px solid #e0e0e0;
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
         # Create right-side navigation container
         with st.container():
             st.markdown("---")
-            st.markdown("## 📱 Navigation")
             
             # Group sections logically
             sections = {
@@ -110,31 +127,42 @@ def sidebar_navigation():
                 "⚙️ System": ["Diagnostics", "Settings"]
             }
             
-            # Create navigation grid
-            nav_cols = st.columns(2)
-            col_idx = 0
-            
+            # Create navigation cards
             for category, items in sections.items():
-                with nav_cols[col_idx % 2]:
-                    st.markdown(f"**{category}**")
+                with st.container():
+                    st.markdown(f"### {category}")
+                    
+                    # Create card-like buttons
                     for item in items:
-                        if st.button(item, key=f"nav_{item}", use_container_width=True):
+                        if st.button(
+                            item, 
+                            key=f"nav_{item}", 
+                            use_container_width=True,
+                            help=f"Navigate to {item}"
+                        ):
                             st.session_state.current_section = item
-                            st.session_state.sidebar_open = False  # Close menu after selection
+                            st.session_state.sidebar_open = False
+                            st.session_state.show_landing = False
                             # Reset journal pages when switching sections
                             if item in ["AM Journal", "PM Journal"]:
                                 st.session_state.journal_page = 'start'
                             st.rerun()
-                    st.markdown("")  # Add spacing
-                col_idx += 1
+                    
+                    st.markdown("")  # Add spacing between categories
             
-            # Add logout button
+            # Add special buttons
             st.markdown("---")
-            col1, col2, col3 = st.columns([1, 1, 1])
-            with col2:
-                if st.button("🚪 Logout", use_container_width=True):
-                    st.session_state.authenticated = False
-                    st.rerun()
+            
+            # Home button
+            if st.button("🏠 Home", use_container_width=True):
+                st.session_state.show_landing = True
+                st.session_state.sidebar_open = False
+                st.rerun()
+            
+            # Logout button
+            if st.button("🚪 Logout", use_container_width=True):
+                st.session_state.authenticated = False
+                st.rerun()
             
             # Close menu button
             if st.button("✕ Close Menu", use_container_width=True):
@@ -693,6 +721,110 @@ def workout_tracker():
             st.session_state.workout_page = 'landing'
             st.rerun()
 
+def landing_page():
+    """Landing page showing all modules"""
+    st.title("🌊 LatticeFlow")
+    st.markdown("### Welcome to your integrated journaling and wellness system")
+    
+    # Module cards in a grid layout
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # Journaling modules
+        st.markdown("#### 📝 Journaling")
+        
+        with st.container():
+            st.markdown("**🌅 AM Journal**")
+            st.markdown("Start your day with intention and clarity")
+            if st.button("Start Morning Routine", key="landing_am"):
+                st.session_state.current_section = "AM Journal"
+                st.session_state.show_landing = False
+                st.session_state.journal_page = 'start'
+                st.rerun()
+        
+        st.markdown("")
+        
+        with st.container():
+            st.markdown("**🌙 PM Journal**")
+            st.markdown("Reflect on your day and process experiences")
+            if st.button("Start Evening Routine", key="landing_pm"):
+                st.session_state.current_section = "PM Journal"
+                st.session_state.show_landing = False
+                st.session_state.journal_page = 'start'
+                st.rerun()
+        
+        st.markdown("")
+        
+        # Mental Tools
+        st.markdown("#### 🧠 Mental Tools")
+        
+        with st.container():
+            st.markdown("**🧠 Memory Board**")
+            st.markdown("Capture ideas and important reminders")
+            if st.button("Open Memory Board", key="landing_memory"):
+                st.session_state.current_section = "Memory Board"
+                st.session_state.show_landing = False
+                st.rerun()
+        
+        st.markdown("")
+        
+        with st.container():
+            st.markdown("**🎯 ADHD Toolkit**")
+            st.markdown("Focus tools and coping strategies")
+            if st.button("Open ADHD Toolkit", key="landing_adhd"):
+                st.session_state.current_section = "ADHD Toolkit"
+                st.session_state.show_landing = False
+                st.rerun()
+    
+    with col2:
+        # Physical modules
+        st.markdown("#### 💪 Physical")
+        
+        with st.container():
+            st.markdown("**🏋️ Workout Tracker**")
+            st.markdown("Log workouts with RPE and energy tracking")
+            if st.button("Track Workout", key="landing_workout"):
+                st.session_state.current_section = "Workout Tracker"
+                st.session_state.show_landing = False
+                st.rerun()
+        
+        st.markdown("")
+        
+        with st.container():
+            st.markdown("**🍎 Macro Cheat Sheet**")
+            st.markdown("Nutrition tracking and food reference")
+            if st.button("View Macros", key="landing_macro"):
+                st.session_state.current_section = "Macro Cheat Sheet"
+                st.session_state.show_landing = False
+                st.rerun()
+        
+        st.markdown("")
+        
+        # System modules
+        st.markdown("#### ⚙️ System")
+        
+        with st.container():
+            st.markdown("**🔍 Diagnostics**")
+            st.markdown("System health and validation")
+            if st.button("Run Diagnostics", key="landing_diagnostics"):
+                st.session_state.current_section = "Diagnostics"
+                st.session_state.show_landing = False
+                st.rerun()
+        
+        st.markdown("")
+        
+        with st.container():
+            st.markdown("**⚙️ Settings**")
+            st.markdown("Configure preferences and API keys")
+            if st.button("Open Settings", key="landing_settings"):
+                st.session_state.current_section = "Settings"
+                st.session_state.show_landing = False
+                st.rerun()
+    
+    # Quick stats or recent activity could go here
+    st.markdown("---")
+    st.markdown("*Choose a module above to get started*")
+
 def generate_workout_markdown(entry):
     """Generate markdown export for workout"""
     md = f"## 🏋️ Workout Log — {entry['timestamp'][:10]}\n\n"
@@ -998,8 +1130,10 @@ def main():
     # Main content area
     section = sidebar_navigation()
     
-    # Route to appropriate section (no LatticeFlow header per request)
-    if section == "AM Journal":
+    # Show landing page or selected section
+    if st.session_state.show_landing:
+        landing_page()
+    elif section == "AM Journal":
         am_journal()
     elif section == "PM Journal":
         pm_journal()
