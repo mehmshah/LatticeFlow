@@ -14,7 +14,7 @@ st.set_page_config(
     page_title="LatticeFlow",
     page_icon="🌊",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # --- Initialize session state ---
@@ -71,53 +71,77 @@ def get_secret(key: str) -> Optional[str]:
 # --- Simplified authentication (no password for testing) ---
 def authenticate():
     """Skip authentication for testing"""
-    st.session_state.authenticated = True
-    st.sidebar.title("🌊 LatticeFlow")
-    st.sidebar.markdown("---")
-    st.sidebar.info("🔓 Authentication disabled for testing")
+    if not st.session_state.authenticated:
+        st.session_state.authenticated = True
+        # Show brief auth message in main area
+        with st.container():
+            st.info("🔓 Authentication disabled for testing")
 
 # --- Enhanced navigation ---
 def sidebar_navigation():
-    """Enhanced sidebar navigation with icons and organization"""
-    # Collapsible sidebar toggle
-    if 'sidebar_collapsed' not in st.session_state:
-        st.session_state.sidebar_collapsed = False
+    """Right-side hamburger menu navigation"""
+    # Initialize sidebar state
+    if 'sidebar_open' not in st.session_state:
+        st.session_state.sidebar_open = False
     
-    # Toggle button in main area
-    col1, col2 = st.columns([1, 10])
-    with col1:
-        if st.button("☰" if st.session_state.sidebar_collapsed else "✕", key="sidebar_toggle"):
-            st.session_state.sidebar_collapsed = not st.session_state.sidebar_collapsed
+    # Create top bar with hamburger menu
+    col1, col2, col3 = st.columns([8, 1, 1])
+    
+    with col2:
+        st.markdown(f"**{st.session_state.current_section}**")
+    
+    with col3:
+        if st.button("☰", key="hamburger_menu", help="Navigation Menu"):
+            st.session_state.sidebar_open = not st.session_state.sidebar_open
             st.rerun()
     
-    if not st.session_state.sidebar_collapsed:
-        st.sidebar.markdown("## 📱 Navigation")
-        
-        # Group sections logically
-        sections = {
-            "📝 Journaling": ["AM Journal", "PM Journal"],
-            "💪 Physical": ["Workout Tracker", "Macro Cheat Sheet"],
-            "🧠 Mental Tools": ["Memory Board", "ADHD Toolkit"],
-            "⚙️ System": ["Diagnostics", "Settings"]
-        }
-        
-        selected_section = st.session_state.current_section
-        
-        for category, items in sections.items():
-            st.sidebar.markdown(f"**{category}**")
-            for item in items:
-                if st.sidebar.button(item, key=f"nav_{item}"):
-                    st.session_state.current_section = item
-                    # Reset journal pages when switching sections
-                    if item in ["AM Journal", "PM Journal"]:
-                        st.session_state.journal_page = 'start'
+    # Show navigation menu when open
+    if st.session_state.sidebar_open:
+        # Create right-side navigation container
+        with st.container():
+            st.markdown("---")
+            st.markdown("## 📱 Navigation")
+            
+            # Group sections logically
+            sections = {
+                "📝 Journaling": ["AM Journal", "PM Journal"],
+                "💪 Physical": ["Workout Tracker", "Macro Cheat Sheet"],
+                "🧠 Mental Tools": ["Memory Board", "ADHD Toolkit"],
+                "⚙️ System": ["Diagnostics", "Settings"]
+            }
+            
+            # Create navigation grid
+            nav_cols = st.columns(2)
+            col_idx = 0
+            
+            for category, items in sections.items():
+                with nav_cols[col_idx % 2]:
+                    st.markdown(f"**{category}**")
+                    for item in items:
+                        if st.button(item, key=f"nav_{item}", use_container_width=True):
+                            st.session_state.current_section = item
+                            st.session_state.sidebar_open = False  # Close menu after selection
+                            # Reset journal pages when switching sections
+                            if item in ["AM Journal", "PM Journal"]:
+                                st.session_state.journal_page = 'start'
+                            st.rerun()
+                    st.markdown("")  # Add spacing
+                col_idx += 1
+            
+            # Add logout button
+            st.markdown("---")
+            col1, col2, col3 = st.columns([1, 1, 1])
+            with col2:
+                if st.button("🚪 Logout", use_container_width=True):
+                    st.session_state.authenticated = False
                     st.rerun()
-        
-        # Add logout button
-        st.sidebar.markdown("---")
-        if st.sidebar.button("🚪 Logout"):
-            st.session_state.authenticated = False
-            st.rerun()
+            
+            # Close menu button
+            if st.button("✕ Close Menu", use_container_width=True):
+                st.session_state.sidebar_open = False
+                st.rerun()
+            
+            st.markdown("---")
     
     return st.session_state.current_section
 
