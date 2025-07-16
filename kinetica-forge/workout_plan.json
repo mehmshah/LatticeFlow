@@ -1,8 +1,9 @@
 {
   "monday": {
     "title": "Strength A (Quad/Chest Focus)",
+    "warmup_bike": {"name": "Stationary Bike", "duration": "5-10 min", "intensity": "Light to moderate"},
     "mobility": [
-      {"name": "World’s Greatest Stretch", "reps": "3/side"},
+      {"name": "World's Greatest Stretch", "reps": "3/side"},
       {"name": "Arm Circles + Shoulder Rolls", "duration": "20 sec each direction"},
       {"name": "Bodyweight Squats", "reps": "10"}
     ],
@@ -36,6 +37,12 @@
           {"name": "Standing Calf Raises", "reps": "15–20", "desc": "Rise onto toes slowly. Pause at the top and lower under control."}
         ]
       }
+    ],
+    "core_finisher": [
+      {"name": "Plank Hold", "reps": "45 sec"},
+      {"name": "Russian Twists", "reps": "20"},
+      {"name": "Mountain Climbers", "reps": "15/side"},
+      {"name": "Dead Bug", "reps": "10/side"}
     ]
   },
   "wednesday": {
@@ -75,6 +82,12 @@
           {"name": "Superman Holds", "reps": "30 sec", "desc": "Lift arms, chest, and legs off ground. Engage glutes and spinal erectors."}
         ]
       }
+    ],
+    "core_finisher": [
+      {"name": "Superman Holds", "reps": "30 sec"},
+      {"name": "Bird Dogs", "reps": "10/side"},
+      {"name": "Glute Bridge Hold", "reps": "30 sec"},
+      {"name": "Side Plank", "reps": "20 sec/side"}
     ]
   },
   "friday": {

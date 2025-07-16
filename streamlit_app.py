@@ -531,7 +531,7 @@ def pm_journal():
             st.rerun()
 
 def workout_tracker():
-    """Workout tracking with improved navigation and per-exercise RPE"""
+    """Workout tracking with improved navigation and sectioned flow"""
     st.header("💪 Workout Tracker")
     
     # Load workout plan
@@ -542,41 +542,64 @@ def workout_tracker():
         st.error("Workout plan not found. Please ensure kinetica-forge/workout_plan.json exists.")
         return
     
-    # RPE Framework in sidebar
-    with st.sidebar:
-        st.markdown("### 📊 RPE Framework")
-        st.markdown("""
-        **1-2**: Very light activity
-        **3-4**: Light activity
-        **5-6**: Moderate activity
-        **7**: Vigorous activity
-        **8**: Very vigorous activity
-        **9**: Extremely vigorous
-        **10**: Maximum effort
-        """)
+    # Initialize workout session state
+    if 'workout_section' not in st.session_state:
+        st.session_state.workout_section = 'pre_workout'
+    if 'workout_data' not in st.session_state:
+        st.session_state.workout_data = {}
+    
+    # RPE Framework info button
+    col1, col2 = st.columns([9, 1])
+    with col2:
+        if st.button("ℹ️ RPE", help="RPE Framework Reference"):
+            with st.expander("📊 RPE Framework", expanded=True):
+                st.markdown("""
+                **1-2**: Very light activity
+                **3-4**: Light activity  
+                **5-6**: Moderate activity
+                **7**: Vigorous activity
+                **8**: Very vigorous activity
+                **9**: Extremely vigorous
+                **10**: Maximum effort
+                """)
     
     if st.session_state.workout_page == 'landing':
         st.info("Select a workout template from your established plan:")
         
-        # Show workout options
+        # Show workout options with complete preview
         for day, details in workout_plan.items():
             st.subheader(f"{day.title()}: {details['title']}")
             
-            # Show mobility warm-up
-            with st.expander("Mobility Warm-up"):
+            # Show complete workout preview
+            with st.expander("Full Workout Preview"):
+                # Warm-up bike
+                if 'warmup_bike' in details:
+                    bike = details['warmup_bike']
+                    st.write(f"**🚴 Warm-up:** {bike['name']} - {bike['duration']} ({bike['intensity']})")
+                
+                # Mobility
+                st.write("**🤸 Mobility:**")
                 for move in details.get("mobility", []):
                     st.write(f"• {move['name']} ({move.get('reps', move.get('duration', ''))})")
-            
-            # Show supersets preview
-            with st.expander("Supersets Preview"):
+                
+                # Supersets
+                st.write("**🏋️ Supersets:**")
                 for superset in details.get("supersets", []):
                     st.write(f"**{superset['title']}** - {superset.get('sets', 4)} sets")
                     for ex in superset["exercises"]:
                         st.write(f"  • {ex['name']} - {ex['reps']}")
+                
+                # Core finisher
+                if 'core_finisher' in details:
+                    st.write("**💪 Core Finisher:**")
+                    for ex in details['core_finisher']:
+                        st.write(f"• {ex['name']} - {ex['reps']}")
             
             if st.button(f"Start {day.title()} Workout", key=f"start_{day}"):
                 st.session_state.workout_day = day
                 st.session_state.workout_page = 'logging'
+                st.session_state.workout_section = 'pre_workout'
+                st.session_state.workout_data = {}
                 st.rerun()
         
         # Custom workout option
@@ -593,167 +616,303 @@ def workout_tracker():
         # Back button
         if st.button("← Back to Workout Selection"):
             st.session_state.workout_page = 'landing'
+            st.session_state.workout_section = 'pre_workout'
             st.rerun()
         
-        # Pre-workout scoring with info buttons
-        st.markdown("### 🔄 Pre-Workout Assessment")
+        # Progress indicator
+        sections = ['pre_workout', 'warmup_bike', 'mobility', 'supersets', 'core_finisher', 'post_workout']
+        current_idx = sections.index(st.session_state.workout_section)
+        progress = (current_idx + 1) / len(sections)
+        st.progress(progress, text=f"Section {current_idx + 1} of {len(sections)}")
         
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.info("**Energy Framework**\n1 = depleted\n5 = functional but tired\n10 = fully energized")
-            pre_energy = st.slider("Energy (1-10)", 1, 10, 5, key="pre_energy")
-        with col2:
-            st.info("**Mood Framework**\n1 = anxious/irritable\n5 = neutral\n10 = positive/uplifted")
-            pre_mood = st.slider("Mood (1-10)", 1, 10, 5, key="pre_mood")
-        with col3:
-            st.info("**Recovery Framework**\n1 = sore/exhausted\n5 = okay\n10 = fully recovered")
-            pre_recovery = st.slider("Recovery (1-10)", 1, 10, 5, key="pre_recovery")
-        
-        # Warm-up tracking
-        st.markdown("### 🤸 Warm-up")
-        warmup_completed = {}
-        for move in details.get("mobility", []):
-            warmup_completed[move['name']] = st.checkbox(
-                f"{move['name']} ({move.get('reps', move.get('duration', ''))})",
-                key=f"warmup_{move['name']}"
-            )
-        
-        # Superset logging with per-exercise RPE
-        st.markdown("### 🏋️ Supersets")
-        superset_logs = []
-        
-        for superset_idx, superset in enumerate(details.get("supersets", [])):
-            st.subheader(f"{superset['title']} - {superset.get('sets', 4)} sets")
+        # Pre-workout section
+        if st.session_state.workout_section == 'pre_workout':
+            st.markdown("### 🔄 Pre-Workout Assessment")
             
-            for ex_idx, ex in enumerate(superset["exercises"]):
-                st.markdown(f"**{ex['name']}** - {ex['reps']}")
-                if ex.get("desc"):
-                    st.caption(ex["desc"])
-                
-                # Create columns for each set
-                set_cols = st.columns(superset.get('sets', 4))
-                exercise_sets = []
-                
-                for set_num in range(superset.get('sets', 4)):
-                    with set_cols[set_num]:
-                        st.write(f"Set {set_num + 1}")
-                        actual_reps = st.text_input(
-                            "Reps", 
-                            value=ex["reps"], 
-                            key=f"reps_{superset_idx}_{ex_idx}_{set_num}"
-                        )
-                        rpe = st.slider(
-                            "RPE", 
-                            1, 10, 7, 
-                            key=f"rpe_{superset_idx}_{ex_idx}_{set_num}"
-                        )
-                        completed = st.checkbox(
-                            "✓", 
-                            key=f"done_{superset_idx}_{ex_idx}_{set_num}"
-                        )
-                        
-                        exercise_sets.append({
-                            "set": set_num + 1,
-                            "reps": actual_reps,
-                            "rpe": rpe,
-                            "completed": completed
-                        })
-                
-                superset_logs.append({
-                    "exercise": ex["name"],
-                    "planned_reps": ex["reps"],
-                    "sets": exercise_sets
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.info("**Energy Framework**\n1 = depleted\n5 = functional but tired\n10 = fully energized")
+                pre_energy = st.slider("Energy (1-10)", 1, 10, 
+                                      st.session_state.workout_data.get('pre_energy', 5), key="pre_energy")
+            with col2:
+                st.info("**Mood Framework**\n1 = anxious/irritable\n5 = neutral\n10 = positive/uplifted")
+                pre_mood = st.slider("Mood (1-10)", 1, 10, 
+                                   st.session_state.workout_data.get('pre_mood', 5), key="pre_mood")
+            with col3:
+                st.info("**Recovery Framework**\n1 = sore/exhausted\n5 = okay\n10 = fully recovered")
+                pre_recovery = st.slider("Recovery (1-10)", 1, 10, 
+                                        st.session_state.workout_data.get('pre_recovery', 5), key="pre_recovery")
+            
+            if st.button("Next: Warm-up Bike →"):
+                st.session_state.workout_data.update({
+                    'pre_energy': pre_energy,
+                    'pre_mood': pre_mood,
+                    'pre_recovery': pre_recovery
                 })
-                
-                st.markdown("---")
+                st.session_state.workout_section = 'warmup_bike'
+                st.rerun()
         
-        # Cool-down
-        st.markdown("### 🧘 Cool-down")
-        cooldown_notes = st.text_area("Cool-down notes:", height=80)
-        
-        # Post-workout scoring with info buttons
-        st.markdown("### 🔄 Post-Workout Assessment")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.info("**Energy Framework**\n1 = depleted\n5 = functional but tired\n10 = fully energized")
-            post_energy = st.slider("Post-Energy (1-10)", 1, 10, 5, key="post_energy")
-        with col2:
-            st.info("**Mood Framework**\n1 = anxious/irritable\n5 = neutral\n10 = positive/uplifted")
-            post_mood = st.slider("Post-Mood (1-10)", 1, 10, 5, key="post_mood")
-        with col3:
-            st.info("**Recovery Framework**\n1 = sore/exhausted\n5 = okay\n10 = fully recovered")
-            post_recovery = st.slider("Post-Recovery (1-10)", 1, 10, 5, key="post_recovery")
-        
-        # Notes and auto-tagging
-        st.markdown("### 📝 Notes & Tags")
-        workout_notes = st.text_area("Workout notes:", height=100)
-        
-        # Auto-generated tags
-        completed_sets = sum(1 for log in superset_logs for s in log["sets"] if s["completed"])
-        total_sets = sum(len(log["sets"]) for log in superset_logs)
-        
-        auto_tags = []
-        if completed_sets > total_sets * 0.8:
-            auto_tags.append("#goal_hit")
-        avg_rpe = sum(s["rpe"] for log in superset_logs for s in log["sets"]) / max(total_sets, 1)
-        if avg_rpe >= 8:
-            auto_tags.append("#high_intensity")
-        auto_tags.append("#consistency")
-        
-        selected_tags = st.multiselect("Tags:", auto_tags, default=auto_tags)
-        
-        # Save workout
-        if st.button("💾 Save Workout Log"):
-            workout_entry = {
-                "day": workout_day,
-                "title": details['title'],
-                "timestamp": datetime.now().isoformat(),
-                "pre_scores": {"energy": pre_energy, "mood": pre_mood, "recovery": pre_recovery},
-                "warmup_completed": warmup_completed,
-                "supersets": superset_logs,
-                "cooldown_notes": cooldown_notes,
-                "post_scores": {"energy": post_energy, "mood": post_mood, "recovery": post_recovery},
-                "notes": workout_notes,
-                "tags": selected_tags
-            }
+        # Warm-up bike section
+        elif st.session_state.workout_section == 'warmup_bike':
+            st.markdown("### 🚴 Warm-up Bike")
+            if 'warmup_bike' in details:
+                bike = details['warmup_bike']
+                st.info(f"**{bike['name']}** - {bike['duration']} ({bike['intensity']})")
+                bike_completed = st.checkbox("Bike warm-up completed", 
+                                           value=st.session_state.workout_data.get('bike_completed', False))
+                bike_notes = st.text_area("Bike notes (optional):", height=60,
+                                        value=st.session_state.workout_data.get('bike_notes', ''))
+            else:
+                st.info("No bike warm-up for this workout")
+                bike_completed = True
+                bike_notes = ""
             
-            # Save to workout history
-            os.makedirs("kinetica-forge", exist_ok=True)
-            try:
-                with open("kinetica-forge/workout_history.json", "r") as f:
-                    history = json.load(f)
-            except FileNotFoundError:
-                history = {}
-            
-            today = datetime.now().strftime("%Y-%m-%d")
-            if today not in history:
-                history[today] = []
-            history[today].append(workout_entry)
-            
-            with open("kinetica-forge/workout_history.json", "w") as f:
-                json.dump(history, f, indent=2)
-            
-            st.success("✅ Workout logged successfully!")
-            st.balloons()
-            
-            # Export options
             col1, col2 = st.columns(2)
             with col1:
-                st.download_button(
-                    "Download JSON",
-                    json.dumps(workout_entry, indent=2),
-                    file_name=f"workout_log_{today}.json",
-                    mime="application/json"
-                )
+                if st.button("← Back"):
+                    st.session_state.workout_section = 'pre_workout'
+                    st.rerun()
             with col2:
-                # Generate markdown export
-                markdown_content = generate_workout_markdown(workout_entry)
-                st.download_button(
-                    "Download Markdown",
-                    markdown_content,
-                    file_name=f"workout_log_{today}.md",
-                    mime="text/markdown"
+                if st.button("Next: Mobility →"):
+                    st.session_state.workout_data.update({
+                        'bike_completed': bike_completed,
+                        'bike_notes': bike_notes
+                    })
+                    st.session_state.workout_section = 'mobility'
+                    st.rerun()
+        
+        # Mobility section
+        elif st.session_state.workout_section == 'mobility':
+            st.markdown("### 🤸 Mobility Warm-up")
+            warmup_completed = st.session_state.workout_data.get('warmup_completed', {})
+            
+            for move in details.get("mobility", []):
+                warmup_completed[move['name']] = st.checkbox(
+                    f"{move['name']} ({move.get('reps', move.get('duration', ''))})",
+                    value=warmup_completed.get(move['name'], False),
+                    key=f"warmup_{move['name']}"
                 )
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("← Back"):
+                    st.session_state.workout_section = 'warmup_bike'
+                    st.rerun()
+            with col2:
+                if st.button("Next: Supersets →"):
+                    st.session_state.workout_data['warmup_completed'] = warmup_completed
+                    st.session_state.workout_section = 'supersets'
+                    st.rerun()
+        
+        # Supersets section
+        elif st.session_state.workout_section == 'supersets':
+            st.markdown("### 🏋️ Supersets")
+            superset_logs = st.session_state.workout_data.get('superset_logs', [])
+            
+            for superset_idx, superset in enumerate(details.get("supersets", [])):
+                st.subheader(f"{superset['title']} - {superset.get('sets', 4)} sets")
+                
+                for ex_idx, ex in enumerate(superset["exercises"]):
+                    st.markdown(f"**{ex['name']}** - {ex['reps']}")
+                    if ex.get("desc"):
+                        st.caption(ex["desc"])
+                    
+                    # Create columns for each set
+                    set_cols = st.columns(superset.get('sets', 4))
+                    exercise_sets = []
+                    
+                    for set_num in range(superset.get('sets', 4)):
+                        with set_cols[set_num]:
+                            st.write(f"Set {set_num + 1}")
+                            actual_reps = st.text_input(
+                                "Reps", 
+                                value=ex["reps"], 
+                                key=f"reps_{superset_idx}_{ex_idx}_{set_num}"
+                            )
+                            rpe = st.slider(
+                                "RPE", 
+                                1, 10, 7, 
+                                key=f"rpe_{superset_idx}_{ex_idx}_{set_num}"
+                            )
+                            completed = st.checkbox(
+                                "✓", 
+                                key=f"done_{superset_idx}_{ex_idx}_{set_num}"
+                            )
+                            
+                            exercise_sets.append({
+                                "set": set_num + 1,
+                                "reps": actual_reps,
+                                "rpe": rpe,
+                                "completed": completed
+                            })
+                    
+                    if len(superset_logs) <= superset_idx * len(superset["exercises"]) + ex_idx:
+                        superset_logs.append({
+                            "exercise": ex["name"],
+                            "planned_reps": ex["reps"],
+                            "sets": exercise_sets
+                        })
+                    else:
+                        superset_logs[superset_idx * len(superset["exercises"]) + ex_idx] = {
+                            "exercise": ex["name"],
+                            "planned_reps": ex["reps"],
+                            "sets": exercise_sets
+                        }
+                    
+                    st.markdown("---")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("← Back"):
+                    st.session_state.workout_section = 'mobility'
+                    st.rerun()
+            with col2:
+                if st.button("Next: Core Finisher →"):
+                    st.session_state.workout_data['superset_logs'] = superset_logs
+                    st.session_state.workout_section = 'core_finisher'
+                    st.rerun()
+        
+        # Core finisher section
+        elif st.session_state.workout_section == 'core_finisher':
+            st.markdown("### 💪 Core Finisher")
+            if 'core_finisher' in details:
+                core_completed = st.session_state.workout_data.get('core_completed', {})
+                
+                for ex in details['core_finisher']:
+                    core_completed[ex['name']] = st.checkbox(
+                        f"{ex['name']} - {ex['reps']}",
+                        value=core_completed.get(ex['name'], False),
+                        key=f"core_{ex['name']}"
+                    )
+                
+                st.session_state.workout_data['core_completed'] = core_completed
+            else:
+                st.info("No core finisher for this workout")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("← Back"):
+                    st.session_state.workout_section = 'supersets'
+                    st.rerun()
+            with col2:
+                if st.button("Next: Post-Workout →"):
+                    st.session_state.workout_section = 'post_workout'
+                    st.rerun()
+        
+        # Post-workout section
+        elif st.session_state.workout_section == 'post_workout':
+            st.markdown("### 🔄 Post-Workout Assessment")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.info("**Energy Framework**\n1 = depleted\n5 = functional but tired\n10 = fully energized")
+                post_energy = st.slider("Post-Energy (1-10)", 1, 10, 
+                                       st.session_state.workout_data.get('post_energy', 5), key="post_energy")
+            with col2:
+                st.info("**Mood Framework**\n1 = anxious/irritable\n5 = neutral\n10 = positive/uplifted")
+                post_mood = st.slider("Post-Mood (1-10)", 1, 10, 
+                                     st.session_state.workout_data.get('post_mood', 5), key="post_mood")
+            with col3:
+                st.info("**Recovery Framework**\n1 = sore/exhausted\n5 = okay\n10 = fully recovered")
+                post_recovery = st.slider("Post-Recovery (1-10)", 1, 10, 
+                                         st.session_state.workout_data.get('post_recovery', 5), key="post_recovery")
+            
+            # Cool-down
+            st.markdown("### 🧘 Cool-down")
+            cooldown_notes = st.text_area("Cool-down notes:", height=80,
+                                         value=st.session_state.workout_data.get('cooldown_notes', ''))
+            
+            # Notes and auto-tagging
+            st.markdown("### 📝 Notes & Tags")
+            workout_notes = st.text_area("Workout notes:", height=100,
+                                        value=st.session_state.workout_data.get('workout_notes', ''))
+            
+            # Auto-generated tags
+            superset_logs = st.session_state.workout_data.get('superset_logs', [])
+            completed_sets = sum(1 for log in superset_logs for s in log["sets"] if s["completed"])
+            total_sets = sum(len(log["sets"]) for log in superset_logs)
+            
+            auto_tags = []
+            if completed_sets > total_sets * 0.8:
+                auto_tags.append("#goal_hit")
+            if total_sets > 0:
+                avg_rpe = sum(s["rpe"] for log in superset_logs for s in log["sets"]) / max(total_sets, 1)
+                if avg_rpe >= 8:
+                    auto_tags.append("#high_intensity")
+            auto_tags.append("#consistency")
+            
+            selected_tags = st.multiselect("Tags:", auto_tags, 
+                                         default=st.session_state.workout_data.get('selected_tags', auto_tags))
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("← Back"):
+                    st.session_state.workout_section = 'core_finisher'
+                    st.rerun()
+            with col2:
+                if st.button("💾 Save Workout Log"):
+                    # Compile final workout entry
+                    workout_entry = {
+                        "day": workout_day,
+                        "title": details['title'],
+                        "timestamp": datetime.now().isoformat(),
+                        "pre_scores": {
+                            "energy": st.session_state.workout_data.get('pre_energy', 5), 
+                            "mood": st.session_state.workout_data.get('pre_mood', 5), 
+                            "recovery": st.session_state.workout_data.get('pre_recovery', 5)
+                        },
+                        "bike_completed": st.session_state.workout_data.get('bike_completed', False),
+                        "bike_notes": st.session_state.workout_data.get('bike_notes', ''),
+                        "warmup_completed": st.session_state.workout_data.get('warmup_completed', {}),
+                        "supersets": superset_logs,
+                        "core_completed": st.session_state.workout_data.get('core_completed', {}),
+                        "cooldown_notes": cooldown_notes,
+                        "post_scores": {"energy": post_energy, "mood": post_mood, "recovery": post_recovery},
+                        "notes": workout_notes,
+                        "tags": selected_tags
+                    }
+                    
+                    # Save to workout history
+                    os.makedirs("kinetica-forge", exist_ok=True)
+                    try:
+                        with open("kinetica-forge/workout_history.json", "r") as f:
+                            history = json.load(f)
+                    except FileNotFoundError:
+                        history = {}
+                    
+                    today = datetime.now().strftime("%Y-%m-%d")
+                    if today not in history:
+                        history[today] = []
+                    history[today].append(workout_entry)
+                    
+                    with open("kinetica-forge/workout_history.json", "w") as f:
+                        json.dump(history, f, indent=2)
+                    
+                    st.success("✅ Workout logged successfully!")
+                    st.balloons()
+                    
+                    # Export options
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.download_button(
+                            "Download JSON",
+                            json.dumps(workout_entry, indent=2),
+                            file_name=f"workout_log_{today}.json",
+                            mime="application/json"
+                        )
+                    with col2:
+                        # Generate markdown export
+                        markdown_content = generate_workout_markdown(workout_entry)
+                        st.download_button(
+                            "Download Markdown",
+                            markdown_content,
+                            file_name=f"workout_log_{today}.md",
+                            mime="text/markdown"
+                        )
+                    
+                    # Reset for next workout
+                    st.session_state.workout_page = 'landing'
+                    st.session_state.workout_section = 'pre_workout'
+                    st.session_state.workout_data = {}
     
     elif st.session_state.workout_page == 'custom':
         st.subheader("Custom Workout (Coming Soon)")
