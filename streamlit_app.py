@@ -200,24 +200,32 @@ def am_journal():
         col1, col2 = st.columns(2)
         with col1:
             if st.button("Start 1-Minute Pause", key="am_pause"):
-                # Initialize timer in session state
-                if 'timer_start' not in st.session_state:
-                    st.session_state.timer_start = datetime.now()
-                    st.session_state.timer_active = True
+                st.session_state.timer_start = datetime.now()
+                st.session_state.timer_active = True
+                st.session_state.timer_complete = False
+                st.rerun()
+            
+            # Show timer if active
+            if st.session_state.get('timer_active', False):
+                elapsed = (datetime.now() - st.session_state.timer_start).total_seconds()
+                remaining = max(0, 60 - elapsed)
                 
-                # Show timer if active
-                if st.session_state.get('timer_active', False):
-                    elapsed = (datetime.now() - st.session_state.timer_start).total_seconds()
-                    remaining = max(0, 60 - elapsed)
+                if remaining > 0:
+                    # Create a live countdown display
+                    minutes = int(remaining // 60)
+                    seconds = int(remaining % 60)
+                    timer_placeholder = st.empty()
+                    timer_placeholder.info(f"⏱️ Centering... {minutes:02d}:{seconds:02d} remaining")
                     
-                    if remaining > 0:
-                        st.info(f"⏱️ Centering... {int(remaining)} seconds remaining")
-                        # Auto-refresh every second
-                        st.rerun()
-                    else:
-                        st.success("✅ Pause complete!")
-                        st.session_state.timer_active = False
-                        st.session_state.timer_complete = True
+                    # Auto-refresh every second
+                    import time
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.success("✅ Pause complete!")
+                    st.session_state.timer_active = False
+                    st.session_state.timer_complete = True
+        
         with col2:
             pause_complete = st.checkbox("Pause Complete", 
                                        value=st.session_state.get('timer_complete', False))
@@ -236,15 +244,26 @@ def am_journal():
             sleep_hours = st.number_input("Hours of sleep:", min_value=0.0, max_value=12.0, 
                                         value=st.session_state.am_data.get('sleep_hours', 7.0), step=0.5)
             
-            # Auto-calculate sleep quality based on 7-hour baseline
-            auto_quality = min(10, max(1, round((sleep_hours / 7.0) * 10)))
-            sleep_quality = st.slider("Sleep Quality (1–10)", 1, 10, 
-                                    value=st.session_state.am_data.get('sleep_quality', auto_quality),
-                                    help=f"Auto-suggested: {auto_quality}/10 based on {sleep_hours} hours (7h = 10/10)")
+            # Auto-calculate sleep quality based on 7-hour baseline with proper scaling
+            if sleep_hours >= 7:
+                auto_quality = 10
+            elif sleep_hours >= 6:
+                # 6 hours = 85% of 7 hours, scale to 8.5/10
+                auto_quality = round((sleep_hours / 7.0) * 10, 1)
+            else:
+                # Below 6 hours, linear scale down
+                auto_quality = max(1, round((sleep_hours / 7.0) * 10))
             
-            # Show percentage calculation
+            sleep_quality = st.slider("Sleep Quality (1–10)", 1, 10, 
+                                    value=st.session_state.am_data.get('sleep_quality', int(auto_quality)),
+                                    help=f"Auto-suggested: {auto_quality}/10 based on {sleep_hours} hours")
+            
+            # Show percentage and quality calculation
             percentage = round((sleep_hours / 7.0) * 100)
-            st.caption(f"📊 {sleep_hours}h = {percentage}% of 7-hour baseline")
+            if sleep_hours == 6:
+                st.caption(f"📊 {sleep_hours}h = {percentage}% of baseline → Quality score: 8.5/10")
+            else:
+                st.caption(f"📊 {sleep_hours}h = {percentage}% of 7-hour baseline")
         with col2:
             energy_score = st.slider("Energy Level (1–10)", 1, 10, 
                                    st.session_state.am_data.get('energy_score', 5),
@@ -373,24 +392,32 @@ def pm_journal():
         col1, col2 = st.columns(2)
         with col1:
             if st.button("Start 1-Minute Pause", key="pm_pause"):
-                # Initialize timer in session state
-                if 'pm_timer_start' not in st.session_state:
-                    st.session_state.pm_timer_start = datetime.now()
-                    st.session_state.pm_timer_active = True
+                st.session_state.pm_timer_start = datetime.now()
+                st.session_state.pm_timer_active = True
+                st.session_state.pm_timer_complete = False
+                st.rerun()
+            
+            # Show timer if active
+            if st.session_state.get('pm_timer_active', False):
+                elapsed = (datetime.now() - st.session_state.pm_timer_start).total_seconds()
+                remaining = max(0, 60 - elapsed)
                 
-                # Show timer if active
-                if st.session_state.get('pm_timer_active', False):
-                    elapsed = (datetime.now() - st.session_state.pm_timer_start).total_seconds()
-                    remaining = max(0, 60 - elapsed)
+                if remaining > 0:
+                    # Create a live countdown display
+                    minutes = int(remaining // 60)
+                    seconds = int(remaining % 60)
+                    timer_placeholder = st.empty()
+                    timer_placeholder.info(f"⏱️ Centering... {minutes:02d}:{seconds:02d} remaining")
                     
-                    if remaining > 0:
-                        st.info(f"⏱️ Centering... {int(remaining)} seconds remaining")
-                        # Auto-refresh every second
-                        st.rerun()
-                    else:
-                        st.success("✅ Pause complete!")
-                        st.session_state.pm_timer_active = False
-                        st.session_state.pm_timer_complete = True
+                    # Auto-refresh every second
+                    import time
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.success("✅ Pause complete!")
+                    st.session_state.pm_timer_active = False
+                    st.session_state.pm_timer_complete = True
+        
         with col2:
             pause_complete = st.checkbox("Pause Complete", 
                                        value=st.session_state.get('pm_timer_complete', False))
@@ -658,9 +685,29 @@ def workout_tracker():
         # Warm-up bike section
         elif st.session_state.workout_section == 'warmup_bike':
             st.markdown("### 🚴 Warm-up Bike")
+            
+            # Bike RPE Framework
+            with st.expander("🚴 Bike RPE Framework"):
+                st.markdown("""
+                **Bike-Specific RPE Scale:**
+                - **1-2**: Very easy pedaling, no effort
+                - **3-4**: Light effort, can easily hold conversation
+                - **5-6**: Moderate effort, slight breathlessness
+                - **7**: Vigorous effort, conversation becomes difficult
+                - **8**: Very hard effort, short sentences only
+                - **9-10**: Maximum effort, no conversation possible
+                """)
+            
             if 'warmup_bike' in details:
                 bike = details['warmup_bike']
                 st.info(f"**{bike['name']}** - {bike['duration']} ({bike['intensity']})")
+                
+                # Add RPE tracking for bike
+                bike_rpe = st.slider("Bike RPE (1-10)", 1, 10, 
+                                   st.session_state.workout_data.get('bike_rpe', 5), 
+                                   key="bike_rpe",
+                                   help="Rate your perceived exertion during the bike warm-up")
+                
                 bike_completed = st.checkbox("Bike warm-up completed", 
                                            value=st.session_state.workout_data.get('bike_completed', False))
                 bike_notes = st.text_area("Bike notes (optional):", height=80,
@@ -669,6 +716,7 @@ def workout_tracker():
                 st.info("No bike warm-up for this workout")
                 bike_completed = True
                 bike_notes = ""
+                bike_rpe = 0
             
             col1, col2 = st.columns(2)
             with col1:
@@ -679,7 +727,8 @@ def workout_tracker():
                 if st.button("Next: Mobility →"):
                     st.session_state.workout_data.update({
                         'bike_completed': bike_completed,
-                        'bike_notes': bike_notes
+                        'bike_notes': bike_notes,
+                        'bike_rpe': bike_rpe
                     })
                     st.session_state.workout_section = 'mobility'
                     st.rerun()
@@ -687,14 +736,44 @@ def workout_tracker():
         # Mobility section
         elif st.session_state.workout_section == 'mobility':
             st.markdown("### 🤸 Mobility Warm-up")
+            
+            # Mobility RPE Framework
+            with st.expander("🤸 Mobility RPE Framework"):
+                st.markdown("""
+                **Mobility-Specific RPE Scale:**
+                - **1-3**: Very light stretch, minimal sensation
+                - **4-5**: Moderate stretch, comfortable tension
+                - **6-7**: Good stretch, noticeable but not painful
+                - **8-9**: Deep stretch, approaching discomfort
+                - **10**: Maximum stretch, at edge of comfort
+                """)
+            
             warmup_completed = st.session_state.workout_data.get('warmup_completed', {})
             
+            # Mobility exercise descriptions
+            mobility_descriptions = {
+                "World's Greatest Stretch": "Step into lunge, place inside hand on ground, reach opposite arm to sky. Great for hips and thoracic spine.",
+                "Arm Circles + Shoulder Rolls": "Large arm circles forward and backward, followed by shoulder rolls to warm up shoulder joints.",
+                "Bodyweight Squats": "Deep squats focusing on full range of motion to activate glutes and warm up hip joints.",
+                "Cat-Cow": "On hands and knees, arch and round spine to mobilize vertebrae.",
+                "Glute Bridge March": "Hold bridge position, alternate lifting each leg to activate glutes.",
+                "Hamstring Scoops": "Standing hamstring stretch with scooping motion to lengthen posterior chain.",
+                "Deep Squat + Reach": "Hold deep squat position and reach arms overhead to open hips and thoracic spine.",
+                "T-Spine Openers": "Lying on side, open top arm to ceiling to improve thoracic rotation.",
+                "Hip CARs": "Controlled articular rotations - slow, controlled hip circles in all ranges of motion."
+            }
+            
             for move in details.get("mobility", []):
+                st.markdown(f"**{move['name']}** - {move.get('reps', move.get('duration', ''))}")
+                description = mobility_descriptions.get(move['name'], "Perform this mobility exercise with control and focus on quality of movement.")
+                st.caption(description)
+                
                 warmup_completed[move['name']] = st.checkbox(
-                    f"{move['name']} ({move.get('reps', move.get('duration', ''))})",
+                    f"Completed {move['name']}",
                     value=warmup_completed.get(move['name'], False),
                     key=f"warmup_{move['name']}"
                 )
+                st.markdown("---")
             
             col1, col2 = st.columns(2)
             with col1:
