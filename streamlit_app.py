@@ -122,7 +122,7 @@ def sidebar_navigation():
             # Group sections logically
             sections = {
                 "📝 Journaling": ["AM Journal", "PM Journal"],
-                "💪 Physical": ["Workout Tracker", "Macro Cheat Sheet"],
+                "💪 Physical": ["Workout Tracker", "Macro Tracking"],
                 "🧠 Mental Tools": ["Memory Board", "ADHD Toolkit"],
                 "⚙️ System": ["Diagnostics", "Settings"]
             }
@@ -833,10 +833,10 @@ def landing_page():
         st.markdown("")
         
         with st.container():
-            st.markdown("**🍎 Macro Cheat Sheet**")
+            st.markdown("**🍎 Macro Tracking**")
             st.markdown("Nutrition tracking and food reference")
             if st.button("View Macros", key="landing_macro"):
-                st.session_state.current_section = "Macro Cheat Sheet"
+                st.session_state.current_section = "Macro Tracking"
                 st.session_state.show_landing = False
                 st.rerun()
         
@@ -894,26 +894,57 @@ def generate_workout_markdown(entry):
     
     return md
 
-def macro_cheat_sheet():
+def macro_tracking():
     """Macro tracking with mobile-optimized OCR support"""
-    st.header("🍎 Macro Cheat Sheet")
+    st.header("🍎 Macro Tracking")
     
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Quick Reference", "📱 Label Scanner", "🛒 Grocery List", "📖 Meal Planning"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Macro Cheat Sheet", "📱 Label Scanner", "🛒 Grocery List", "📖 Meal Planning"])
     
     with tab1:
         st.info("Quick macro reference for common foods.")
         
-        # Common foods reference
-        common_foods = {
-            "Protein": {"Chicken breast (100g)": "23g protein, 165 cal", "Eggs (1 large)": "6g protein, 70 cal"},
-            "Carbs": {"Rice (100g cooked)": "23g carbs, 130 cal", "Oats (50g dry)": "27g carbs, 190 cal"},
-            "Fats": {"Olive oil (1 tbsp)": "14g fat, 120 cal", "Avocado (100g)": "15g fat, 160 cal"}
-        }
+        # Common foods data with full nutritional information
+        import pandas as pd
         
-        for category, foods in common_foods.items():
-            st.subheader(category)
-            for food, macro in foods.items():
-                st.write(f"• **{food}**: {macro}")
+        common_foods_data = [
+            {"Name": "Chicken breast", "Category": "Protein", "Serving Size": "100g", "Calories": 165, "Protein (g)": 23, "Carbs (g)": 0, "Fat (g)": 3.6},
+            {"Name": "Eggs", "Category": "Protein", "Serving Size": "1 large", "Calories": 70, "Protein (g)": 6, "Carbs (g)": 0.6, "Fat (g)": 5},
+            {"Name": "Greek yogurt", "Category": "Protein", "Serving Size": "100g", "Calories": 59, "Protein (g)": 10, "Carbs (g)": 3.6, "Fat (g)": 0.4},
+            {"Name": "Salmon", "Category": "Protein", "Serving Size": "100g", "Calories": 208, "Protein (g)": 20, "Carbs (g)": 0, "Fat (g)": 12},
+            {"Name": "Rice (cooked)", "Category": "Carbs", "Serving Size": "100g", "Calories": 130, "Protein (g)": 2.7, "Carbs (g)": 28, "Fat (g)": 0.3},
+            {"Name": "Oats (dry)", "Category": "Carbs", "Serving Size": "50g", "Calories": 190, "Protein (g)": 6.8, "Carbs (g)": 32, "Fat (g)": 3.4},
+            {"Name": "Sweet potato", "Category": "Carbs", "Serving Size": "100g", "Calories": 86, "Protein (g)": 1.6, "Carbs (g)": 20, "Fat (g)": 0.1},
+            {"Name": "Banana", "Category": "Carbs", "Serving Size": "1 medium", "Calories": 105, "Protein (g)": 1.3, "Carbs (g)": 27, "Fat (g)": 0.4},
+            {"Name": "Olive oil", "Category": "Fats", "Serving Size": "1 tbsp", "Calories": 120, "Protein (g)": 0, "Carbs (g)": 0, "Fat (g)": 14},
+            {"Name": "Avocado", "Category": "Fats", "Serving Size": "100g", "Calories": 160, "Protein (g)": 2, "Carbs (g)": 9, "Fat (g)": 15},
+            {"Name": "Almonds", "Category": "Fats", "Serving Size": "28g", "Calories": 164, "Protein (g)": 6, "Carbs (g)": 6, "Fat (g)": 14},
+            {"Name": "Peanut butter", "Category": "Fats", "Serving Size": "2 tbsp", "Calories": 190, "Protein (g)": 8, "Carbs (g)": 8, "Fat (g)": 16}
+        ]
+        
+        # Create DataFrame and display as table
+        df = pd.DataFrame(common_foods_data)
+        
+        # Add category filter
+        categories = ["All"] + list(df["Category"].unique())
+        selected_category = st.selectbox("Filter by category:", categories)
+        
+        if selected_category != "All":
+            filtered_df = df[df["Category"] == selected_category]
+        else:
+            filtered_df = df
+        
+        # Display table
+        st.dataframe(filtered_df, use_container_width=True, hide_index=True)
+        
+        # Add search functionality
+        search_term = st.text_input("Search foods:", placeholder="e.g., chicken, oats...")
+        if search_term:
+            search_df = df[df["Name"].str.contains(search_term, case=False)]
+            if not search_df.empty:
+                st.markdown("### Search Results")
+                st.dataframe(search_df, use_container_width=True, hide_index=True)
+            else:
+                st.info("No foods found matching your search.")
     
     with tab2:
         st.info("📱 Scan food labels for macro information")
@@ -1027,6 +1058,7 @@ def memory_board():
             with cols[i % 3]:
                 with st.container():
                     st.markdown(f"**{card['title']}**")
+                    st.caption(f"🏷️ {card['type']}")
                     st.write(card['content'])
                     st.caption(f"Created: {card['created']}")
                     if st.button("Remove", key=f"remove_card_{i}"):
@@ -1181,8 +1213,8 @@ def main():
         pm_journal()
     elif section == "Workout Tracker":
         workout_tracker()
-    elif section == "Macro Cheat Sheet":
-        macro_cheat_sheet()
+    elif section == "Macro Tracking":
+        macro_tracking()
     elif section == "Memory Board":
         memory_board()
     elif section == "ADHD Toolkit":
