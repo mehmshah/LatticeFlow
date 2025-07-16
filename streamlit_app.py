@@ -200,10 +200,27 @@ def am_journal():
         col1, col2 = st.columns(2)
         with col1:
             if st.button("Start 1-Minute Pause", key="am_pause"):
-                st.info("Take a full minute to center yourself...")
-                # In a real implementation, this would pause for 60 seconds
+                # Initialize timer in session state
+                if 'timer_start' not in st.session_state:
+                    st.session_state.timer_start = datetime.now()
+                    st.session_state.timer_active = True
+                
+                # Show timer if active
+                if st.session_state.get('timer_active', False):
+                    elapsed = (datetime.now() - st.session_state.timer_start).total_seconds()
+                    remaining = max(0, 60 - elapsed)
+                    
+                    if remaining > 0:
+                        st.info(f"⏱️ Centering... {int(remaining)} seconds remaining")
+                        # Auto-refresh every second
+                        st.rerun()
+                    else:
+                        st.success("✅ Pause complete!")
+                        st.session_state.timer_active = False
+                        st.session_state.timer_complete = True
         with col2:
-            pause_complete = st.checkbox("Pause Complete")
+            pause_complete = st.checkbox("Pause Complete", 
+                                       value=st.session_state.get('timer_complete', False))
         
         if st.button("Next: Sleep & Energy →", key="am_next1"):
             st.session_state.am_data['pause_complete'] = pause_complete
@@ -218,9 +235,16 @@ def am_journal():
         with col1:
             sleep_hours = st.number_input("Hours of sleep:", min_value=0.0, max_value=12.0, 
                                         value=st.session_state.am_data.get('sleep_hours', 7.0), step=0.5)
+            
+            # Auto-calculate sleep quality based on 7-hour baseline
+            auto_quality = min(10, max(1, round((sleep_hours / 7.0) * 10)))
             sleep_quality = st.slider("Sleep Quality (1–10)", 1, 10, 
-                                    st.session_state.am_data.get('sleep_quality', 5),
-                                    help="1 = very poor (<4h), 5 = light/interrupted, 10 = rested/uninterrupted")
+                                    value=st.session_state.am_data.get('sleep_quality', auto_quality),
+                                    help=f"Auto-suggested: {auto_quality}/10 based on {sleep_hours} hours (7h = 10/10)")
+            
+            # Show percentage calculation
+            percentage = round((sleep_hours / 7.0) * 100)
+            st.caption(f"📊 {sleep_hours}h = {percentage}% of 7-hour baseline")
         with col2:
             energy_score = st.slider("Energy Level (1–10)", 1, 10, 
                                    st.session_state.am_data.get('energy_score', 5),
@@ -349,9 +373,27 @@ def pm_journal():
         col1, col2 = st.columns(2)
         with col1:
             if st.button("Start 1-Minute Pause", key="pm_pause"):
-                st.info("Take a full minute to center yourself...")
+                # Initialize timer in session state
+                if 'pm_timer_start' not in st.session_state:
+                    st.session_state.pm_timer_start = datetime.now()
+                    st.session_state.pm_timer_active = True
+                
+                # Show timer if active
+                if st.session_state.get('pm_timer_active', False):
+                    elapsed = (datetime.now() - st.session_state.pm_timer_start).total_seconds()
+                    remaining = max(0, 60 - elapsed)
+                    
+                    if remaining > 0:
+                        st.info(f"⏱️ Centering... {int(remaining)} seconds remaining")
+                        # Auto-refresh every second
+                        st.rerun()
+                    else:
+                        st.success("✅ Pause complete!")
+                        st.session_state.pm_timer_active = False
+                        st.session_state.pm_timer_complete = True
         with col2:
-            pause_complete = st.checkbox("Pause Complete")
+            pause_complete = st.checkbox("Pause Complete", 
+                                       value=st.session_state.get('pm_timer_complete', False))
         
         if st.button("Next: Reflection →", key="pm_next1"):
             st.session_state.pm_data['pause_complete'] = pause_complete
@@ -390,7 +432,7 @@ def pm_journal():
             
             scores = st.session_state.pm_data.get('scores', {})
             for group_name, group_metrics in metric_groups["metric_groups"].items():
-                if group_name in ["Emotional Regulation", "ADHD + Self-Management", "Relationships", "Wellness + Physical State", "Learning + Meaning"]:
+                if group_name in ["Emotional Regulation", "ADHD + Self-Management", "Relationship", "Wellness + Physical State", "Learning + Meaning"]:
                     st.subheader(f"{group_name}")
                     for metric_name, metric_info in group_metrics.items():
                         if metric_info["scale"] == "1–10":
