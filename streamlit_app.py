@@ -17,6 +17,231 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# --- Fullscript Brand Styling ---
+def inject_fullscript_styling():
+    """Inject Fullscript brand colors and styling"""
+    st.markdown("""
+    <style>
+    /* Fullscript Brand Colors */
+    :root {
+        --fullscript-primary: #2E7D32;      /* Forest Green */
+        --fullscript-secondary: #66BB6A;     /* Light Green */
+        --fullscript-accent: #81C784;        /* Mint Green */
+        --fullscript-neutral: #F5F5F5;       /* Light Gray */
+        --fullscript-dark: #1B5E20;          /* Dark Green */
+        --fullscript-text: #2E2E2E;          /* Charcoal */
+        --fullscript-error: #E57373;         /* Soft Red */
+        --fullscript-warning: #FFB74D;       /* Amber */
+        --fullscript-success: #81C784;       /* Success Green */
+    }
+    
+    /* Main App Background */
+    .stApp {
+        background: linear-gradient(135deg, #F5F5F5 0%, #E8F5E8 100%);
+        color: var(--fullscript-text);
+    }
+    
+    /* Headers */
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--fullscript-dark) !important;
+        font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Primary Buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, var(--fullscript-primary) 0%, var(--fullscript-secondary) 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 600 !important;
+        box-shadow: 0 2px 8px rgba(46, 125, 50, 0.2) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3) !important;
+        background: linear-gradient(135deg, var(--fullscript-dark) 0%, var(--fullscript-primary) 100%) !important;
+    }
+    
+    /* Navigation Cards */
+    .nav-card {
+        background: white;
+        border: 2px solid var(--fullscript-accent);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 0.5rem 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .nav-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(46, 125, 50, 0.15);
+        border-color: var(--fullscript-primary);
+    }
+    
+    /* Input Fields */
+    .stTextInput > div > div > input {
+        border: 2px solid var(--fullscript-accent) !important;
+        border-radius: 8px !important;
+        padding: 0.75rem !important;
+        font-size: 1rem !important;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: var(--fullscript-primary) !important;
+        box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1) !important;
+    }
+    
+    .stTextArea > div > div > textarea {
+        border: 2px solid var(--fullscript-accent) !important;
+        border-radius: 8px !important;
+        padding: 0.75rem !important;
+    }
+    
+    .stTextArea > div > div > textarea:focus {
+        border-color: var(--fullscript-primary) !important;
+        box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1) !important;
+    }
+    
+    /* Sliders */
+    .stSlider > div > div > div > div {
+        background: var(--fullscript-accent) !important;
+    }
+    
+    .stSlider > div > div > div > div > div[role="slider"] {
+        background: var(--fullscript-primary) !important;
+    }
+    
+    /* Select Boxes */
+    .stSelectbox > div > div > div {
+        border: 2px solid var(--fullscript-accent) !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Info/Success/Warning Messages */
+    .stInfo {
+        background: linear-gradient(135deg, #E8F5E8 0%, #F1F8E9 100%) !important;
+        border-left: 4px solid var(--fullscript-primary) !important;
+        border-radius: 8px !important;
+    }
+    
+    .stSuccess {
+        background: linear-gradient(135deg, #E8F5E8 0%, #F1F8E9 100%) !important;
+        border-left: 4px solid var(--fullscript-success) !important;
+        border-radius: 8px !important;
+    }
+    
+    .stWarning {
+        background: linear-gradient(135deg, #FFF8E1 0%, #FFFDE7 100%) !important;
+        border-left: 4px solid var(--fullscript-warning) !important;
+        border-radius: 8px !important;
+    }
+    
+    .stError {
+        background: linear-gradient(135deg, #FFEBEE 0%, #FCE4EC 100%) !important;
+        border-left: 4px solid var(--fullscript-error) !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Cards and Containers */
+    .element-container > div {
+        background: rgba(255, 255, 255, 0.8) !important;
+        border-radius: 12px !important;
+        padding: 1rem !important;
+        margin: 0.5rem 0 !important;
+        border: 1px solid rgba(46, 125, 50, 0.1) !important;
+    }
+    
+    /* Hamburger Menu Styling */
+    .sidebar-overlay {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 255, 248, 0.98) 100%) !important;
+        border-left: 3px solid var(--fullscript-primary) !important;
+        backdrop-filter: blur(10px) !important;
+    }
+    
+    /* Tabs */
+    .stTabs > div > div > div > div {
+        background: var(--fullscript-primary) !important;
+        color: white !important;
+        border-radius: 8px 8px 0 0 !important;
+    }
+    
+    /* Expanders */
+    .streamlit-expanderHeader {
+        background: linear-gradient(135deg, var(--fullscript-neutral) 0%, #FFFFFF 100%) !important;
+        border: 2px solid var(--fullscript-accent) !important;
+        border-radius: 8px !important;
+        color: var(--fullscript-dark) !important;
+    }
+    
+    /* Footer */
+    .footer {
+        background: var(--fullscript-dark);
+        color: white;
+        text-align: center;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 2rem;
+    }
+    
+    /* Progress Bars */
+    .stProgress > div > div > div > div {
+        background: var(--fullscript-primary) !important;
+    }
+    
+    /* Checkboxes */
+    .stCheckbox > label > div > div {
+        border-color: var(--fullscript-primary) !important;
+    }
+    
+    .stCheckbox > label > div > div[data-checked="true"] {
+        background-color: var(--fullscript-primary) !important;
+    }
+    
+    /* Landing Page Cards */
+    .landing-card {
+        background: linear-gradient(135deg, #FFFFFF 0%, #F8FFF8 100%);
+        border: 2px solid var(--fullscript-accent);
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 1rem 0;
+        box-shadow: 0 6px 20px rgba(46, 125, 50, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .landing-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(46, 125, 50, 0.2);
+        border-color: var(--fullscript-primary);
+    }
+    
+    /* Custom Typography */
+    .brand-title {
+        background: linear-gradient(135deg, var(--fullscript-primary) 0%, var(--fullscript-secondary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+        font-size: 3rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    /* Metric Cards */
+    .metric-card {
+        background: linear-gradient(135deg, #FFFFFF 0%, #F8FFF8 100%);
+        border-left: 4px solid var(--fullscript-primary);
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 0.5rem 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 # --- Initialize session state ---
 def init_session_state():
     """Initialize session state variables"""
@@ -723,7 +948,7 @@ def workout_tracker():
 
 def landing_page():
     """Landing page showing all modules"""
-    st.title("🌊 LatticeFlow")
+    st.markdown('<h1 class="brand-title">🌊 LatticeFlow</h1>', unsafe_allow_html=True)
     st.markdown("### Welcome to your integrated journaling and wellness system")
     
     # Module cards in a grid layout
@@ -733,93 +958,117 @@ def landing_page():
         # Journaling modules
         st.markdown("#### 📝 Journaling")
         
-        with st.container():
-            st.markdown("**🌅 AM Journal**")
-            st.markdown("Start your day with intention and clarity")
-            if st.button("Start Morning Routine", key="landing_am"):
-                st.session_state.current_section = "AM Journal"
-                st.session_state.show_landing = False
-                st.session_state.journal_page = 'start'
-                st.rerun()
+        st.markdown("""
+        <div class="landing-card">
+            <h4 style="color: var(--fullscript-dark); margin-bottom: 0.5rem;">🌅 AM Journal</h4>
+            <p style="color: var(--fullscript-text); margin-bottom: 1rem;">Start your day with intention and clarity</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Start Morning Routine", key="landing_am"):
+            st.session_state.current_section = "AM Journal"
+            st.session_state.show_landing = False
+            st.session_state.journal_page = 'start'
+            st.rerun()
         
         st.markdown("")
         
-        with st.container():
-            st.markdown("**🌙 PM Journal**")
-            st.markdown("Reflect on your day and process experiences")
-            if st.button("Start Evening Routine", key="landing_pm"):
-                st.session_state.current_section = "PM Journal"
-                st.session_state.show_landing = False
-                st.session_state.journal_page = 'start'
-                st.rerun()
+        st.markdown("""
+        <div class="landing-card">
+            <h4 style="color: var(--fullscript-dark); margin-bottom: 0.5rem;">🌙 PM Journal</h4>
+            <p style="color: var(--fullscript-text); margin-bottom: 1rem;">Reflect on your day and process experiences</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Start Evening Routine", key="landing_pm"):
+            st.session_state.current_section = "PM Journal"
+            st.session_state.show_landing = False
+            st.session_state.journal_page = 'start'
+            st.rerun()
         
         st.markdown("")
         
         # Mental Tools
         st.markdown("#### 🧠 Mental Tools")
         
-        with st.container():
-            st.markdown("**🧠 Memory Board**")
-            st.markdown("Capture ideas and important reminders")
-            if st.button("Open Memory Board", key="landing_memory"):
-                st.session_state.current_section = "Memory Board"
-                st.session_state.show_landing = False
-                st.rerun()
+        st.markdown("""
+        <div class="landing-card">
+            <h4 style="color: var(--fullscript-dark); margin-bottom: 0.5rem;">🧠 Memory Board</h4>
+            <p style="color: var(--fullscript-text); margin-bottom: 1rem;">Capture ideas and important reminders</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Open Memory Board", key="landing_memory"):
+            st.session_state.current_section = "Memory Board"
+            st.session_state.show_landing = False
+            st.rerun()
         
         st.markdown("")
         
-        with st.container():
-            st.markdown("**🎯 ADHD Toolkit**")
-            st.markdown("Focus tools and coping strategies")
-            if st.button("Open ADHD Toolkit", key="landing_adhd"):
-                st.session_state.current_section = "ADHD Toolkit"
-                st.session_state.show_landing = False
-                st.rerun()
+        st.markdown("""
+        <div class="landing-card">
+            <h4 style="color: var(--fullscript-dark); margin-bottom: 0.5rem;">🎯 ADHD Toolkit</h4>
+            <p style="color: var(--fullscript-text); margin-bottom: 1rem;">Focus tools and coping strategies</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Open ADHD Toolkit", key="landing_adhd"):
+            st.session_state.current_section = "ADHD Toolkit"
+            st.session_state.show_landing = False
+            st.rerun()
     
     with col2:
         # Physical modules
         st.markdown("#### 💪 Physical")
         
-        with st.container():
-            st.markdown("**🏋️ Workout Tracker**")
-            st.markdown("Log workouts with RPE and energy tracking")
-            if st.button("Track Workout", key="landing_workout"):
-                st.session_state.current_section = "Workout Tracker"
-                st.session_state.show_landing = False
-                st.rerun()
+        st.markdown("""
+        <div class="landing-card">
+            <h4 style="color: var(--fullscript-dark); margin-bottom: 0.5rem;">🏋️ Workout Tracker</h4>
+            <p style="color: var(--fullscript-text); margin-bottom: 1rem;">Log workouts with RPE and energy tracking</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Track Workout", key="landing_workout"):
+            st.session_state.current_section = "Workout Tracker"
+            st.session_state.show_landing = False
+            st.rerun()
         
         st.markdown("")
         
-        with st.container():
-            st.markdown("**🍎 Macro Cheat Sheet**")
-            st.markdown("Nutrition tracking and food reference")
-            if st.button("View Macros", key="landing_macro"):
-                st.session_state.current_section = "Macro Cheat Sheet"
-                st.session_state.show_landing = False
-                st.rerun()
+        st.markdown("""
+        <div class="landing-card">
+            <h4 style="color: var(--fullscript-dark); margin-bottom: 0.5rem;">🍎 Macro Cheat Sheet</h4>
+            <p style="color: var(--fullscript-text); margin-bottom: 1rem;">Nutrition tracking and food reference</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("View Macros", key="landing_macro"):
+            st.session_state.current_section = "Macro Cheat Sheet"
+            st.session_state.show_landing = False
+            st.rerun()
         
         st.markdown("")
         
         # System modules
         st.markdown("#### ⚙️ System")
         
-        with st.container():
-            st.markdown("**🔍 Diagnostics**")
-            st.markdown("System health and validation")
-            if st.button("Run Diagnostics", key="landing_diagnostics"):
-                st.session_state.current_section = "Diagnostics"
-                st.session_state.show_landing = False
-                st.rerun()
+        st.markdown("""
+        <div class="landing-card">
+            <h4 style="color: var(--fullscript-dark); margin-bottom: 0.5rem;">🔍 Diagnostics</h4>
+            <p style="color: var(--fullscript-text); margin-bottom: 1rem;">System health and validation</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Run Diagnostics", key="landing_diagnostics"):
+            st.session_state.current_section = "Diagnostics"
+            st.session_state.show_landing = False
+            st.rerun()
         
         st.markdown("")
         
-        with st.container():
-            st.markdown("**⚙️ Settings**")
-            st.markdown("Configure preferences and API keys")
-            if st.button("Open Settings", key="landing_settings"):
-                st.session_state.current_section = "Settings"
-                st.session_state.show_landing = False
-                st.rerun()
+        st.markdown("""
+        <div class="landing-card">
+            <h4 style="color: var(--fullscript-dark); margin-bottom: 0.5rem;">⚙️ Settings</h4>
+            <p style="color: var(--fullscript-text); margin-bottom: 1rem;">Configure preferences and API keys</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Open Settings", key="landing_settings"):
+            st.session_state.current_section = "Settings"
+            st.session_state.show_landing = False
+            st.rerun()
     
     # Quick stats or recent activity could go here
     st.markdown("---")
@@ -1124,6 +1373,7 @@ def settings():
 # --- Main application ---
 def main():
     """Main application entry point"""
+    inject_fullscript_styling()
     init_session_state()
     authenticate()
     
@@ -1152,7 +1402,11 @@ def main():
     
     # Footer
     st.markdown("---")
-    st.markdown("*LatticeFlow © 2025 | Built with Streamlit*")
+    st.markdown("""
+    <div class="footer">
+        <p style="margin: 0; font-weight: 500;">LatticeFlow © 2025 | Built with Streamlit | Powered by Fullscript Design</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
