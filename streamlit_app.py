@@ -566,6 +566,9 @@ def workout_tracker():
     if st.session_state.workout_page == 'landing':
         st.info("Select a workout template from your established plan:")
         
+        # Show last week's performance if available
+        show_weekly_progression()
+        
         # Show workout options with complete preview
         for day, details in workout_plan.items():
             st.subheader(f"{day.title()}: {details['title']}")
@@ -660,7 +663,7 @@ def workout_tracker():
                 st.info(f"**{bike['name']}** - {bike['duration']} ({bike['intensity']})")
                 bike_completed = st.checkbox("Bike warm-up completed", 
                                            value=st.session_state.workout_data.get('bike_completed', False))
-                bike_notes = st.text_area("Bike notes (optional):", height=60,
+                bike_notes = st.text_area("Bike notes (optional):", height=80,
                                         value=st.session_state.workout_data.get('bike_notes', ''))
             else:
                 st.info("No bike warm-up for this workout")
@@ -716,6 +719,11 @@ def workout_tracker():
                     st.markdown(f"**{ex['name']}** - {ex['reps']}")
                     if ex.get("desc"):
                         st.caption(ex["desc"])
+                    
+                    # Show last week's performance for this exercise
+                    last_week_performance = get_last_week_exercise_data(ex['name'], workout_day)
+                    if last_week_performance:
+                        st.caption(f"🔄 Last week: {last_week_performance}")
                     
                     # Create columns for each set
                     set_cols = st.columns(superset.get('sets', 4))
@@ -1025,6 +1033,98 @@ def landing_page():
     # Quick stats or recent activity could go here
     st.markdown("---")
     st.markdown("*Choose a module above to get started*")
+
+def get_last_week_exercise_data(exercise_name, workout_day):
+    """Get last week's performance for a specific exercise"""
+    try:
+        with open("kinetica-forge/workout_history.json", "r") as f:
+            history = json.load(f)
+        
+        # Find last week's workout for this day
+        for date_str, entries in history.items():
+            if isinstance(entries, list):
+                for entry in entries:
+                    if entry.get('day') == workout_day:
+                        supersets = entry.get('supersets', [])
+                        for log in supersets:
+                            if log.get('exercise') == exercise_name:
+                                sets_data = log.get('sets', [])
+                                if sets_data:
+                                    # Get average RPE and typical reps
+                                    avg_rpe = sum(s.get('rpe', 7) for s in sets_data) / len(sets_data)
+                                    typical_reps = sets_data[0].get('reps', 'N/A')
+                                    return f"{typical_reps} reps @ RPE {avg_rpe:.1f}"
+        return None
+    except FileNotFoundError:
+        return None
+
+def show_weekly_progression():
+    """Show last week's workout performance to guide this week's training"""
+    try:
+        with open("kinetica-forge/workout_history.json", "r") as f:
+            history = json.load(f)
+    except FileNotFoundError:
+        return
+    
+    # Get last week's data
+    from datetime import datetime, timedelta
+    
+    last_week_start = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+    last_week_entries = {}
+    
+    # Collect last week's workouts
+    for date_str, entries in history.items():
+        if isinstance(entries, list):
+            for entry in entries:
+                if entry.get('day'):
+                    last_week_entries[entry['day']] = entry
+    
+    if last_week_entries:
+        with st.expander("📊 Last Week's Performance Review", expanded=True):
+            st.info("Use last week's data to guide this week's progression:")
+            
+            for day, entry in last_week_entries.items():
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    st.markdown(f"**{day.title()}**: {entry.get('title', 'N/A')}")
+                    
+                with col2:
+                    # Show average RPE
+                    supersets = entry.get('supersets', [])
+                    if supersets:
+                        total_rpe = sum(s['rpe'] for log in supersets for s in log.get('sets', []) if 'rpe' in s)
+                        total_sets = sum(len(log.get('sets', [])) for log in supersets)
+                        avg_rpe = round(total_rpe / max(total_sets, 1), 1) if total_sets > 0 else 0
+                        st.metric("Avg RPE", f"{avg_rpe}/10")
+                    
+                with col3:
+                    # Show completion rate
+                    if supersets:
+                        completed = sum(s.get('completed', False) for log in supersets for s in log.get('sets', []))
+                        total = sum(len(log.get('sets', [])) for log in supersets)
+                        completion_rate = round((completed / max(total, 1)) * 100) if total > 0 else 0
+                        st.metric("Completion", f"{completion_rate}%")
+                
+                # Progression suggestions
+                if supersets:
+                    with st.expander(f"Progression Notes for {day.title()}"):
+                        for log in supersets:
+                            exercise_name = log.get('exercise', 'Unknown')
+                            sets_data = log.get('sets', [])
+                            if sets_data:
+                                avg_rpe = sum(s.get('rpe', 7) for s in sets_data) / len(sets_data)
+                                if avg_rpe < 7:
+                                    st.success(f"✅ {exercise_name}: Consider increasing weight/reps (RPE was {avg_rpe:.1f})")
+                                elif avg_rpe > 8.5:
+                                    st.warning(f"⚠️ {exercise_name}: Consider reducing intensity (RPE was {avg_rpe:.1f})")
+                                else:
+                                    st.info(f"➡️ {exercise_name}: Maintain current progression (RPE was {avg_rpe:.1f})")
+            
+            st.markdown("**💡 Progression Tips:**")
+            st.markdown("- RPE 6-7: Increase weight or reps")
+            st.markdown("- RPE 7-8: Perfect progression zone") 
+            st.markdown("- RPE 8+: Maintain or slightly reduce")
 
 def generate_workout_markdown(entry):
     """Generate markdown export for workout"""
