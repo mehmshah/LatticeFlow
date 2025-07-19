@@ -1,5 +1,6 @@
 {
-  "monday": {
+  "workouts": []
+
     "title": "Strength A (Quad/Chest Focus)",
     "warmup_bike": {"name": "Stationary Bike", "duration": "5-10 min", "intensity": "Light to moderate"},
     "mobility": [

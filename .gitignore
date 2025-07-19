@@ -87,3 +87,4 @@ replit.nix
 
 # Ignore node_modules if any
 node_modules/
+.streamlit/secrets.toml

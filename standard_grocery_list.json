@@ -1,0 +1,8 @@
+[
+    {"name": "Eggs", "default_storage": "fridge", "default_duration_days": 14},
+    {"name": "Milk", "default_storage": "fridge", "default_duration_days": 7},
+    {"name": "Chicken Breast", "default_storage": "freezer", "default_duration_days": 90},
+    {"name": "Spinach", "default_storage": "fridge", "default_duration_days": 5},
+    {"name": "Rice", "default_storage": "pantry", "default_duration_days": 180},
+    {"name": "Carrots", "default_storage": "fridge", "default_duration_days": 14}
+]

@@ -1,0 +1,12 @@
+{
+  "pm_routine": [
+    {"type": "pause", "content": "Let’s pause for a full minute.\nMantra: 'I choose commitment, integrity, control, and compassion for the best version of myself.'", "private": false},
+    {"type": "reflection", "content": "Start with a free-form reflection on your day. Say 'Free reflection complete' when done.", "private": false},
+    {"type": "adhd_outcome", "content": "Free-form reflection on ADHD outcomes today. How did your focus and strategies play out?", "private": false},
+    {"type": "relationship_review", "content": "Free-form reflection on your relationships today (Gabby, Cleo, Parents, Brother, Friends).", "private": false},
+    {"type": "metric_scoring", "content": "Based on your reflections, here are draft scores and descriptions for your mood, energy, and other metrics. Please review and confirm or revise.", "private": false},
+    {"type": "macro_summary", "content": "How did your macros (nutrition, exercise, etc.) go today?", "private": false},
+    {"type": "tagging", "content": "Tags and emotional scoring (GoEmotions-Reduced, mapped to 1–10)", "private": false},
+    {"type": "confirm_log", "content": "Review, confirm, and log your full entry.", "private": false}
+  ]
+}

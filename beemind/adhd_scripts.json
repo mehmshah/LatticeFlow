@@ -1,0 +1,52 @@
+[
+    {
+        "name": "Morning Routine",
+        "category": "Routine",
+        "tags": ["AM", "start", "focus"],
+        "description": "Step-by-step morning routine for ADHD management.",
+        "content": [
+            "Wake up and hydrate immediately.",
+            "Review today's intentions and top 3 priorities.",
+            "Do a 2-minute body scan or mindfulness check.",
+            "Take prescribed medication (if applicable).",
+            "Eat a protein-rich breakfast.",
+            "Review coping scripts and strategies for the day."
+        ]
+    },
+    {
+        "name": "Task Switching",
+        "category": "Strategy",
+        "tags": ["transition", "work", "focus"],
+        "description": "Strategies for smooth transitions between tasks.",
+        "content": [
+            "Set a 2-minute timer for transition breaks.",
+            "Write down the next task before leaving the current one.",
+            "Do a quick physical reset: stand, stretch, deep breath.",
+            "Use a visual cue (sticky note, phone alarm) for new task start."
+        ]
+    },
+    {
+        "name": "Emotional Regulation",
+        "category": "Coping",
+        "tags": ["emotion", "regulation", "calm"],
+        "description": "Techniques for managing emotions.",
+        "content": [
+            "Pause and name the emotion you're feeling.",
+            "Use a 4-7-8 breathing exercise.",
+            "Remind yourself: 'Emotions are temporary.'",
+            "If overwhelmed, step outside or change rooms for 2 minutes."
+        ]
+    },
+    {
+        "name": "PM Wind Down",
+        "category": "Routine",
+        "tags": ["PM", "sleep", "relax"],
+        "description": "Evening routine for better sleep and calm.",
+        "content": [
+            "Set a phone alarm for wind-down time.",
+            "Dim lights and reduce screen time 1 hour before bed.",
+            "Do a 5-minute reflection or gratitude journal.",
+            "Prepare tomorrow's clothes and essentials." 
+        ]
+    }
+]

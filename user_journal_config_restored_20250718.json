@@ -1,0 +1,28 @@
+{
+  "am_routine": [
+    {"type": "pause", "content": "Let’s pause for a full minute.\nMantra: 'I choose commitment, integrity, control, and compassion for the best version of myself.'", "private": false},
+    {"type": "metric", "content": "How many hours did you sleep last night? (1 = <4h/very poor, 5 = 4–6h/light/interrupted, 10 = 7+h/rested/uninterrupted)", "private": false, "framework": "1-10"},
+    {"type": "metric", "content": "What is your mood this morning? (1 = very low/anxious, 5 = neutral, 10 = excellent)", "private": false, "framework": "1-10"},
+    {"type": "metric", "content": "What is your current energy level? (1 = depleted, 5 = functional but tired, 10 = energized and clear)", "private": false, "framework": "1-10"},
+    {"type": "adhd_focus", "content": "What is your ADHD focus for today?", "private": false, "show_adhd_materials": true},
+    {"type": "adhd_strategy", "content": "What strategy will support this?", "private": false, "show_adhd_materials": true},
+    {"type": "adhd_success", "content": "What would make today feel like a success?", "private": false, "show_adhd_materials": true},
+    {"type": "intention", "content": "How do you want to show up for Gabby today?", "private": false},
+    {"type": "intention", "content": "What is your intention for Cleo today?", "private": false},
+    {"type": "intention", "content": "Any follow-up needed for your parents or brother today?", "private": false},
+    {"type": "intention", "content": "How might you reach out to friends today?", "private": false}
+  ],
+  "pm_routine": [
+    {"type": "pause", "content": "Let’s pause for a full minute.\nMantra: 'I choose commitment, integrity, control, and compassion for the best version of myself.'", "private": false},
+    {"type": "reflection", "content": "Start with free-form reflection. Say 'Free reflection complete' when done.", "private": false},
+    {"type": "relationship_followup", "content": "Expand on how things were with Gabby today.", "private": false, "entity": "Gabby"},
+    {"type": "relationship_followup", "content": "Expand on how things were with Cleo today.", "private": false, "entity": "Cleo"},
+    {"type": "relationship_followup", "content": "Expand on how things were with your parents today.", "private": false, "entity": "Parents"},
+    {"type": "relationship_followup", "content": "Expand on how things were with your brother today.", "private": false, "entity": "Brother"},
+    {"type": "relationship_followup", "content": "Expand on how things were with your friends today.", "private": false, "entity": "Friends"},
+    {"type": "metric_scoring", "content": "GPT proposes scores from your reflection. Please confirm or revise.", "private": false},
+    {"type": "tagging", "content": "Tags and emotional scoring (GoEmotions-Reduced, mapped to 1–10)", "private": false},
+    {"type": "macro_summary", "content": "Macro summary of the day.", "private": false},
+    {"type": "confirm_log", "content": "Review, confirm, and log your full entry.", "private": false}
+  ]
+}

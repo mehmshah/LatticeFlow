@@ -69,6 +69,41 @@ def log_workout_flow(day):
     plan = load_workout_plan()
     details = plan[day]
     st.header(f"Logging: {details['title']}")
+    # --- Last Week's Performance ---
+    import os
+    from datetime import datetime, timedelta
+    history_path = WORKOUT_HISTORY_PATH
+    # Find most recent previous log for this workout day (e.g., 'friday')
+    last_log = None
+    last_log_date = None
+    if os.path.exists(history_path):
+        with open(history_path) as f:
+            try:
+                history = json.load(f)
+                # Get all dates before today, sorted descending
+                today_str = datetime.now().strftime("%Y-%m-%d")
+                prev_dates = [d for d in history if d < today_str]
+                prev_dates.sort(reverse=True)
+                for d in prev_dates:
+                    for log in history[d]:
+                        if log.get("day") == day:
+                            last_log = log
+                            last_log_date = d
+                            break
+                    if last_log:
+                        break
+            except Exception:
+                last_log = None
+                last_log_date = None
+    with st.expander("Last Logged Performance", expanded=True):
+        if last_log:
+            st.markdown(f"**Date:** {last_log_date}")
+            for s in last_log.get("supersets", []):
+                st.write(f"- {s['exercise']}: {s['reps']} ({'✔️' if s['completed'] else '❌'})")
+            st.write(f"**RPE:** {last_log.get('rpe','')}")
+            st.write(f"**Notes:** {last_log.get('notes','')}")
+        else:
+            st.info(f"No previous log found for this workout.")
     st.write("### Pre-Workout Scores")
     pre_energy = st.slider("Energy (1-10)", 1, 10, 5)
     pre_mood = st.slider("Mood (1-10)", 1, 10, 5)
@@ -157,7 +192,7 @@ def main():
     elif st.session_state['page'] == 'log_workout':
         log_workout_flow(st.session_state['workout_day'])
     elif st.session_state['page'] == 'new_workout':
-        st.write("New workout template creation coming soon.")
+        new_workout_flow()
     elif st.session_state['page'] == 'physio_log':
         physio_log_flow()
 

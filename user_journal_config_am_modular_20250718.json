@@ -1,0 +1,17 @@
+{
+  "am_routine": [
+    {"type": "pause", "content": "Let’s pause for a full minute.\nMantra: 'I choose commitment, integrity, control, and compassion for the best version of myself.'", "private": false},
+    {"type": "metric", "content": "How many hours did you sleep last night? (1 = <4h/very poor, 5 = 4–6h/light/interrupted, 10 = 7+h/rested/uninterrupted)", "private": false, "framework": "1-10"},
+    {"type": "metric", "content": "What is your mood this morning? (1 = very low/anxious, 3 = irritable/withdrawn, 5 = neutral, 7 = hopeful/calm, 10 = excellent/joyful)", "private": false, "framework": "1-10"},
+    {"type": "metric", "content": "What is your current energy level? (1 = depleted, 5 = functional but tired, 10 = energized and clear)", "private": false, "framework": "1-10"},
+    {"type": "resource", "content": "Check today’s weather.", "private": false},
+    {"type": "resource", "content": "Review today’s calendar.", "private": false},
+    {"type": "adhd_focus", "content": "What is your ADHD focus for today?", "private": false, "show_adhd_materials": true},
+    {"type": "adhd_strategy", "content": "What strategy will support this?", "private": false, "show_adhd_materials": true},
+    {"type": "adhd_success", "content": "What would make today feel like a success?", "private": false, "show_adhd_materials": true},
+    {"type": "intention", "content": "How do you want to show up for Gabby today?", "private": false},
+    {"type": "intention", "content": "What is your intention for Cleo today?", "private": false},
+    {"type": "intention", "content": "Any follow-up needed for your parents or brother today?", "private": false},
+    {"type": "intention", "content": "How might you reach out to friends today?", "private": false}
+  ]
+}

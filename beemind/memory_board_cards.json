@@ -1,0 +1,18 @@
+[
+  {
+    "id": "user_1",
+    "title": "Weekly Planning",
+    "content": "Review your week and set top 3 priorities.",
+    "tags": ["planning", "weekly", "focus"],
+    "last_reviewed": null,
+    "relevant_today": []
+  },
+  {
+    "id": "user_2",
+    "title": "Deep Work Reminder",
+    "content": "Block distractions and set a timer for deep work.",
+    "tags": ["work", "focus", "strategy"],
+    "last_reviewed": null,
+    "relevant_today": []
+  }
+]

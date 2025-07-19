@@ -1,5 +1,17 @@
 {
-  "2025-07-01": {
-    "User": {"Deadlift": {"sets": 3, "reps": 6, "rpe": 9}}
-  }
+  "2025-07-11": [
+    {
+      "day": "friday",
+      "timestamp": "2025-07-11T18:00:00",
+      "pre_scores": {"energy": 5, "mood": 6, "recovery": 7},
+      "supersets": [
+        {"exercise": "Deadlift", "reps": "3x6", "completed": true},
+        {"exercise": "Pull-up", "reps": "3x8", "completed": true}
+      ],
+      "rpe": 8,
+      "post_scores": {"energy": 4, "mood": 7, "recovery": 6},
+      "notes": "Felt strong, grip faded in last set.",
+      "tags": ["#consistency"]
+    }
+  ]
 }

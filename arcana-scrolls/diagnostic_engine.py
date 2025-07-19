@@ -2,12 +2,14 @@
 # This should be triggered after journaling is completed, but before /log-journal
 # It inspects GPT behavior and output consistency across categories and halts if any logic failed.
 
+from beemind import load_adhd_scripts, load_memory_cards, save_memory_cards
+
 def run_journal_diagnostics(journal_log, recent_logs, instruction_set):
     issues = []
 
     # 1. Trend Reference Check
     if not journal_log.get("trend_reference"):
-        issues.append("Trend data not pulled or referenced.")
+        issues.append("Trend data not pulled or referenced from beemind.")
 
     # 2. Reflection Depth Check
     for section in journal_log.get("reflection_sections", []):

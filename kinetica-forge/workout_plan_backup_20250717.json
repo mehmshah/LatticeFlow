@@ -1,0 +1,139 @@
+{
+  "monday": {
+    "title": "Strength A (Quad/Chest Focus)",
+    "warmup_bike": {"name": "Stationary Bike", "duration": "5-10 min", "intensity": "Light to moderate"},
+    "mobility": [
+      {"name": "World's Greatest Stretch", "reps": "3/side"},
+      {"name": "Arm Circles + Shoulder Rolls", "duration": "20 sec each direction"},
+      {"name": "Bodyweight Squats", "reps": "10"}
+    ],
+    "supersets": [
+      {
+        "title": "Superset 1", "sets": 4,
+        "exercises": [
+          {"name": "Goblet Squats", "reps": "8–10", "desc": "Hold a dumbbell/kettlebell at chest height. Squat down keeping heels flat, knees out, and torso upright."},
+          {"name": "Wall Sit (Weighted Optional)", "reps": "30–45 sec", "desc": "Back against wall, knees at 90°. Optional: hold a dumbbell for added resistance."}
+        ]
+      },
+      {
+        "title": "Superset 2", "sets": 4,
+        "exercises": [
+          {"name": "Dumbbell Bench Press", "reps": "8–12", "desc": "Press dumbbells from chest to full lockout, elbows slightly tucked. Lower slowly with control."},
+          {"name": "Dumbbell Lateral Raises", "reps": "12", "desc": "Raise dumbbells out to the sides to shoulder height. Keep tension on delts throughout movement."}
+        ]
+      },
+      {
+        "title": "Superset 3", "sets": 4,
+        "exercises": [
+          {"name": "Walking Lunges", "reps": "8/leg", "desc": "Step forward into lunge, keep front knee above ankle. Push off with front heel."},
+          {"name": "Arnold Press", "reps": "8–10", "desc": "Start palms facing in. Rotate palms outward as you press up. Enhances full shoulder range."}
+        ]
+      },
+      {
+        "title": "Superset 4", "sets": 3,
+        "exercises": [
+          {"name": "Triceps Kickbacks", "reps": "12", "desc": "Hinge forward, keep upper arms locked in place. Extend elbows to full lockout."},
+          {"name": "Incline Push-Ups", "reps": "10–15", "desc": "Hands on bench or elevated surface. Maintain tight core, lower until chest nearly touches surface."},
+          {"name": "Standing Calf Raises", "reps": "15–20", "desc": "Rise onto toes slowly. Pause at the top and lower under control."}
+        ]
+      }
+    ],
+    "core_finisher": [
+      {"name": "Plank Hold", "reps": "45 sec"},
+      {"name": "Russian Twists", "reps": "20"},
+      {"name": "Mountain Climbers", "reps": "15/side"},
+      {"name": "Dead Bug", "reps": "10/side"}
+    ]
+  },
+  "wednesday": {
+    "title": "Strength B (Posterior/Back Focus)",
+    "mobility": [
+      {"name": "Cat-Cow", "reps": "8"},
+      {"name": "Glute Bridge March", "reps": "10"},
+      {"name": "Hamstring Scoops", "reps": "10"}
+    ],
+    "supersets": [
+      {
+        "title": "Superset 1", "sets": 4,
+        "exercises": [
+          {"name": "DB Romanian Deadlifts", "reps": "8–10", "desc": "Hinge at hips, dumbbells close to legs. Engage hamstrings and glutes on the way up."},
+          {"name": "Glute Bridges", "reps": "12", "desc": "Squeeze glutes at the top, avoid arching lower back. Optionally elevate feet on bench."}
+        ]
+      },
+      {
+        "title": "Superset 2", "sets": 4,
+        "exercises": [
+          {"name": "Bent-Over Rows", "reps": "10", "desc": "Keep back flat, row dumbbells to lower ribcage. Squeeze shoulder blades at top."},
+          {"name": "Hammer Curls", "reps": "12", "desc": "Palms face each other. Curl dumbbells up, control the eccentric."}
+        ]
+      },
+      {
+        "title": "Superset 3", "sets": 4,
+        "exercises": [
+          {"name": "Reverse Lunges", "reps": "8/leg", "desc": "Step backward into controlled lunge, front shin vertical. Push off to stand."},
+          {"name": "DB Overhead Press", "reps": "10", "desc": "Press straight overhead. Engage core, avoid arching back."}
+        ]
+      },
+      {
+        "title": "Superset 4", "sets": 3,
+        "exercises": [
+          {"name": "Rear Delt Raises", "reps": "12", "desc": "Hinge forward, lift dumbbells out and slightly back. Pause and squeeze at top."},
+          {"name": "Prone T-Y-I Raises", "reps": "10 each", "desc": "Lying face down, raise arms into a T, then Y, then I. Strengthens upper back/posture."},
+          {"name": "Superman Holds", "reps": "30 sec", "desc": "Lift arms, chest, and legs off ground. Engage glutes and spinal erectors."}
+        ]
+      }
+    ],
+    "core_finisher": [
+      {"name": "Superman Holds", "reps": "30 sec"},
+      {"name": "Bird Dogs", "reps": "10/side"},
+      {"name": "Glute Bridge Hold", "reps": "30 sec"},
+      {"name": "Side Plank", "reps": "20 sec/side"}
+    ]
+  },
+  "friday": {
+    "title": "Strength C (Core + Stability Focus)",
+    "mobility": [
+      {"name": "Deep Squat + Reach", "reps": "5"},
+      {"name": "T-Spine Openers", "reps": "3/side"},
+      {"name": "Hip CARs", "reps": "5/side"}
+    ],
+    "supersets": [
+      {
+        "title": "Superset 1", "sets": 4,
+        "exercises": [
+          {"name": "Bulgarian Split Squats", "reps": "8/leg", "desc": "Back foot on bench, lower until front thigh is parallel. Control depth and balance."},
+          {"name": "Prone Dumbbell Reverse Flies", "reps": "15", "desc": "Lying face down on bench, raise dumbbells out to sides. Great for rear delts and posture."}
+        ]
+      },
+      {
+        "title": "Superset 2", "sets": 4,
+        "exercises": [
+          {"name": "DB Z-Press", "reps": "8–10", "desc": "Sit on floor, legs extended. Press dumbbells overhead without leaning back."},
+          {"name": "Glute March from Bridge", "reps": "10/leg", "desc": "Hold bridge, lift one foot off floor at a time. Keep hips level."}
+        ]
+      },
+      {
+        "title": "Superset 3", "sets": 4,
+        "exercises": [
+          {"name": "Single-Leg RDL", "reps": "8/leg", "desc": "Balance on one leg, hinge forward with flat back. Stretch hamstrings and stabilize core."},
+          {"name": "Side-Lying Hip Abduction", "reps": "15/side", "desc": "Lie on side, lift top leg upward with control. Avoid rocking."}
+        ]
+      },
+      {
+        "title": "Superset 4", "sets": 3,
+        "exercises": [
+          {"name": "Overhead DB Hold", "reps": "30 sec/arm", "desc": "Hold one dumbbell overhead, arm straight. Keep ribs down and core tight."},
+          {"name": "Goblet Cossack Squat", "reps": "8/side", "desc": "Hold dumbbell at chest. Step wide, squat to one side, keeping the other leg straight."},
+          {"name": "External Rotation (DB Elbow Tuck)", "reps": "15/side", "desc": "Tuck elbow to side, hold dumbbell, rotate outward like opening a door. Strengthens rotator cuff."}
+        ]
+      }
+    ],
+    "core_finisher": [
+      {"name": "V-Ups", "reps": "12"},
+      {"name": "Bird Dogs", "reps": "10/side"},
+      {"name": "Side Plank Reach-Throughs", "reps": "10/side"},
+      {"name": "Deadbugs", "reps": "10/side"},
+      {"name": "Seated Knee Tucks", "reps": "12"}
+    ]
+  }
+}
